@@ -5,16 +5,23 @@
 #define MAX_BUILDINGS   10
 
 void handleKeyPress(Camera2D& camera, Rectangle& player, int speed, bool grounded){
-	if (IsKeyDown(KEY_RIGHT)){
+	if (IsKeyDown(KEY_D)){
 		player.x += speed*GetFrameTime();
-		camera.offset.x -= speed*GetFrameTime();
+	//	camera.offset.x -= speed*GetFrameTime();
 	}
-	else if (IsKeyDown(KEY_LEFT)){
+	else if (IsKeyDown(KEY_A)){
 		player.x -= speed*GetFrameTime();
-		camera.offset.x += speed*GetFrameTime();
+	//	camera.offset.x += speed*GetFrameTime();
 	}
-	if (IsKeyDown(KEY_UP) && grounded){
-		player.y -= speed*5*GetFrameTime();
+	if (IsKeyDown(KEY_W)){
+		player.y -= speed*GetFrameTime();
+	}
+	if (IsKeyDown(KEY_S)){
+		player.y += speed*GetFrameTime();
+	}
+	if (IsKeyDown(KEY_R)){
+		player.x = 1000;
+		player.y = 500;
 	}
 }
 void handlePhysics(Camera2D& camera, Rectangle& player, int speed, std::vector<Rectangle> objects, const int gravity, bool& grounded ){
@@ -69,7 +76,7 @@ int main() {
 	const int width     = 1920;
 	const int height    = 1080;
 	const int speed     = 1000;
-	const int gravity   = 800;
+	const int gravity   = 350;
 	bool      grounded  = false;
 
 	InitWindow(width, height, "a-raylib-project");
@@ -91,7 +98,9 @@ int main() {
 		handleKeyPress(camera, player, speed, grounded);
 		handlePhysics(camera, player, speed, objects, gravity, grounded);
 
-		camera.target.x = player.x;
+		std::cout << GetMouseX() << " - " << GetMouseY() << std::endl;
+		camera.offset.x = -player.x - GetMouseX()/5 + width/2;
+		camera.offset.y = -player.y - GetMouseY()/5 + height/1.5;
 
 
 		BeginDrawing();
