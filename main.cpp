@@ -4,7 +4,7 @@
 #include "raylib.h"
 #define MAX_BUILDINGS   10
 
-void handleKeyPress(Camera2D& camera, Rectangle& player, int speed){
+void handleKeyPress(Camera2D& camera, Rectangle& player, int speed, bool grounded){
 	if (IsKeyDown(KEY_RIGHT)){
 		player.x += speed*GetFrameTime();
 		camera.offset.x -= speed*GetFrameTime();
@@ -13,18 +13,24 @@ void handleKeyPress(Camera2D& camera, Rectangle& player, int speed){
 		player.x -= speed*GetFrameTime();
 		camera.offset.x += speed*GetFrameTime();
 	}
-	if (IsKeyDown(KEY_UP) ){
-		player.y -= speed*2*GetFrameTime();
+	if (IsKeyDown(KEY_UP) && grounded){
+		player.y -= speed*5*GetFrameTime();
 	}
 }
-void handlePhysics(Camera2D& camera, Rectangle& player, int speed, std::vector<Rectangle> objects, const int gravity ){
+void handlePhysics(Camera2D& camera, Rectangle& player, int speed, std::vector<Rectangle> objects, const int gravity, bool& grounded ){
+	grounded = false;
+	player.y += gravity*GetFrameTime();
 	for( int i = 0; i < objects.size(); i ++ ){
-		if( player.x + player.width > objects[i].x && player.x < objects[i].x + objects[i].width && player.y + player.height > objects[i].y && player.y < objects[i].y + objects[i].height ){
+		if( player.x > objects[i].x - player.width                  &&
+			       	player.x < objects[i].x + objects[i].width  &&
+			       	player.y > objects[i].y - player.height     &&
+			       	player.y < objects[i].y + objects[i].height ){
+
 			int side[4];
 			side[0] = player.y + player.height - objects[i].y;
 			side[1] = player.y - objects[i].y - objects[i].height;
 
-			side[2] = player.x - objects[i].x;
+			side[2] = player.x - objects[i].x + player.width;
 			side[3] = player.x - objects[i].x - objects[i].width;
 
 
@@ -34,42 +40,56 @@ void handlePhysics(Camera2D& camera, Rectangle& player, int speed, std::vector<R
 			for( int i = 0; i < 4; i ++ ){
 				abs(side[i]) < s ? (s = abs(side[i]), ind = i) : NULL;
 			}
-			std::cout << s << " - " << ind << std::endl;
+
 			if( ind == 0 ){
-				player.y = objects[i].y - player.height - 1;
+				player.y = objects[i].y - player.height;
+				grounded = true;
 			}
-			ind == 0 ? player.y = objects[i].y - player.height - 1 : ind == 1 ? player.y = objects[i].y + objects[i].height : ind == 2 ? player.x = objects[i].x - player.width : ind == 3 ? player.x = objects[i].x + objects[i].width : NULL;
+			if( ind == 1 ){
+				player.y = objects[i].y + objects[i].height;
+				grounded = true;
+			}
+			if( ind == 2 ){
+				player.x = objects[i].x - player.width;
+			}
+			if( ind == 3 ){
+				player.x = objects[i].x + objects[i].width;
+			}
 		}
-		else {
-			player.y += gravity*GetFrameTime();
-		}
+	}
+}
+void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
+	for( int i = 0; i < buildings; i ++ ){
+		Rectangle obj = { i*spacing + 1500, y, a, b };
+		objects.push_back(obj);
 	}
 }
 
 int main() {
-	const int WIDTH   = 1920;
-	const int HEIGHT  = 1080;
-	const int speed   = 1000;
-	const int gravity = 200;
+	const int width     = 1920;
+	const int height    = 1080;
+	const int speed     = 1000;
+	const int gravity   = 800;
+	bool      grounded  = false;
 
-	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
+	InitWindow(width, height, "a-raylib-project");
 
-	Rectangle player = { WIDTH/2, HEIGHT/2, 40, 40 };
-	Rectangle floor  = { 0, HEIGHT/2 + 40, 1000, 50 };
-	Rectangle obj    = { 100, HEIGHT/2 - 200, 100, 100 };
+	Rectangle player = { width/2, height/3, 40, 40 };
+	Rectangle floor  = { -100, height/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;
 	objects.push_back(floor);
-	objects.push_back(obj);
+
+	genBuildings(objects, 100, 500, 300, 100, 100);
 
 	Camera2D camera = {{ 0 }, {0, 0}, 0.0f, 2.0f };
-	camera.zoom = 0.8f;
+	camera.zoom = 1.0f;
 
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
 
 	while (!WindowShouldClose()){
-		handleKeyPress(camera, player, speed);
-		handlePhysics(camera, player, speed, objects, gravity);
+		handleKeyPress(camera, player, speed, grounded);
+		handlePhysics(camera, player, speed, objects, gravity, grounded);
 
 		camera.target.x = player.x;
 
@@ -80,8 +100,11 @@ int main() {
 		
 		//Draw floor
 		DrawRectangleRec(floor, DARKGRAY);
-		DrawRectangleRec(obj, DARKGRAY);
+		for( int i = 0; i < objects.size(); i ++ ){
+			DrawRectangleRec(objects[i], DARKGRAY);
+		}
 		DrawRectangleRec(player, RED);
+
 		EndMode2D();
 		EndDrawing();
 	}
