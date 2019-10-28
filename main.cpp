@@ -4,34 +4,43 @@
 #include "raylib.h"
 #define MAX_BUILDINGS   10
 
-void handleKeyPress(Camera2D& camera, Rectangle& player, int speed, bool grounded){
+#define WIDTH    1920
+#define HEIGHT   1080
+#define SPEED    1000
+#define GRAVITY  0
+
+void handleKeyPress(Camera2D& camera, Rectangle& player, bool grounded){
 	if (IsKeyDown(KEY_D)){
-		player.x += speed*GetFrameTime();
-	//	camera.offset.x -= speed*GetFrameTime();
+		player.x += SPEED*GetFrameTime();
+	//	camera.offset.x -= SPEED*GetFrameTime();
 	}
 	else if (IsKeyDown(KEY_A)){
-		player.x -= speed*GetFrameTime();
-	//	camera.offset.x += speed*GetFrameTime();
+		player.x -= SPEED*GetFrameTime();
+	//	camera.offset.x += SPEED*GetFrameTime();
 	}
 	if (IsKeyDown(KEY_W)){
-		player.y -= speed*GetFrameTime();
+		player.y -= SPEED*GetFrameTime();
 	}
 	if (IsKeyDown(KEY_S)){
-		player.y += speed*GetFrameTime();
+		player.y += SPEED*GetFrameTime();
+	}
+	if (IsKeyDown(KEY_R)){
+		player.x = 1000;
+		player.y = 500;
 	}
 	if (IsKeyDown(KEY_R)){
 		player.x = 1000;
 		player.y = 500;
 	}
 }
-void handlePhysics(Camera2D& camera, Rectangle& player, int speed, std::vector<Rectangle> objects, const int gravity, bool& grounded ){
+void handlePhysics(Camera2D& camera, Rectangle& player, std::vector<Rectangle> objects, bool& grounded ){
 	grounded = false;
-	player.y += gravity*GetFrameTime();
+	player.y += GRAVITY*GetFrameTime();
 	for( int i = 0; i < objects.size(); i ++ ){
 		if( player.x > objects[i].x - player.width                  &&
-			       	player.x < objects[i].x + objects[i].width  &&
-			       	player.y > objects[i].y - player.height     &&
-			       	player.y < objects[i].y + objects[i].height ){
+				player.x < objects[i].x + objects[i].width  &&
+				player.y > objects[i].y - player.height     &&
+				player.y < objects[i].y + objects[i].height ){
 
 			int side[4];
 			side[0] = player.y + player.height - objects[i].y;
@@ -65,6 +74,7 @@ void handlePhysics(Camera2D& camera, Rectangle& player, int speed, std::vector<R
 		}
 	}
 }
+//TODO: rewrite this to use new spawnRect function
 void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
 	for( int i = 0; i < buildings; i ++ ){
 		Rectangle obj = { i*spacing + 1500, y, a, b };
@@ -72,17 +82,18 @@ void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, c
 	}
 }
 
+void spawnRect(std::vector<Rectangle>& objects, float x, float y, int a, int b){
+	Rectangle temp = { x, y, a, b };
+	objects.push_back(temp);
+}
+
 int main() {
-	const int width     = 1920;
-	const int height    = 1080;
-	const int speed     = 1000;
-	const int gravity   = 350;
-	bool      grounded  = false;
+	bool grounded  = false;
 
-	InitWindow(width, height, "a-raylib-project");
+	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
 
-	Rectangle player = { width/2, height/3, 40, 40 };
-	Rectangle floor  = { -100, height/2 + 40, 10000, 50 };
+	Rectangle player = { WIDTH/2, HEIGHT/3, 40, 40 };
+	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;
 	objects.push_back(floor);
@@ -95,12 +106,20 @@ int main() {
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
 
 	while (!WindowShouldClose()){
-		handleKeyPress(camera, player, speed, grounded);
-		handlePhysics(camera, player, speed, objects, gravity, grounded);
+		handleKeyPress(camera, player, grounded);
+		handlePhysics(camera, player, objects, grounded);
 
-		std::cout << GetMouseX() << " - " << GetMouseY() << std::endl;
-		camera.offset.x = -player.x - GetMouseX()/5 + width/2;
-		camera.offset.y = -player.y - GetMouseY()/5 + height/1.5;
+		camera.offset.x = -player.x - GetMouseX()/5 + WIDTH/2;
+		camera.offset.y = -player.y - GetMouseY()/5 + HEIGHT/1.5;
+
+		
+		//if mouse is clicked
+		if( IsMouseButtonPressed(0) ){
+			float temp_x = -camera.offset.x + GetMouseX();
+			float temp_y = -camera.offset.y + GetMouseY();
+			
+			spawnRect(objects, temp_x - 25, temp_y - 25, 50, 50);
+		}
 
 
 		BeginDrawing();
