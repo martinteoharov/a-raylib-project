@@ -2,14 +2,40 @@
 #include <vector>
 #include <math.h>
 #include "raylib.h"
-#define MAX_BUILDINGS   10
 
 #define WIDTH    1920
 #define HEIGHT   1080
 #define SPEED    1000
 #define GRAVITY  0
 
-void handleKeyPress(Camera2D& camera, Rectangle& player, bool grounded){
+
+struct Bullet {
+	float x;
+	float y;
+	float speedX;
+	float speedY;
+};
+
+
+//TODO: rewrite this to use new spawnRect function
+void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
+	for( int i = 0; i < buildings; i ++ ){
+		Rectangle obj = { i*spacing + 1500, y, a, b };
+		objects.push_back(obj);
+	}
+}
+
+void spawnRect(std::vector<Rectangle>& objects, float x, float y, int a, int b){
+	Rectangle temp = { x, y, a, b };
+	objects.push_back(temp);
+}
+
+void spawnBullet(std::vector<Bullet>& bullets, Rectangle& player, float x, float y, float speedX, float speedY){
+	Bullet bullet = {x, y, speedX, speedY};
+	bullets.push_back(bullet);
+}
+
+void handleKeyPress(Camera2D& camera, Rectangle& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool grounded){
 	if (IsKeyDown(KEY_D)){
 		player.x += SPEED*GetFrameTime();
 	//	camera.offset.x -= SPEED*GetFrameTime();
@@ -27,14 +53,39 @@ void handleKeyPress(Camera2D& camera, Rectangle& player, bool grounded){
 	if (IsKeyDown(KEY_R)){
 		player.x = 1000;
 		player.y = 500;
+		// Erase pasted objects
+		for( int i = 0; i < objects.size(); i ++ ){
+			objects.erase(objects.begin() + 1 + 100, objects.begin() + objects.size());
+		}
 	}
 	if (IsKeyDown(KEY_R)){
 		player.x = 1000;
 		player.y = 500;
 	}
+	
+	// Spawn rect object
+	if(IsMouseButtonDown(0)){
+		float temp_x = -camera.offset.x + GetMouseX();
+		float temp_y = -camera.offset.y + GetMouseY();
+
+		spawnRect(objects, temp_x - 25, temp_y - 25, 50, 50);
+	}
+
+	// Spawn bullet object
+	if(IsMouseButtonDown(1)){
+		float temp_x = -camera.offset.x + GetMouseX();
+		float temp_y = -camera.offset.y + GetMouseY();
+		spawnBullet(bullets, player, player.x + player.width/2, player.y + player.height/2, (temp_x - player.x)/10, (temp_y - player.y)/10);
+
+		if(bullets.size() > 100){
+			bullets.erase(bullets.begin(), bullets.begin()+1);
+		}
+	}
+	
 }
-void handlePhysics(Camera2D& camera, Rectangle& player, std::vector<Rectangle> objects, bool& grounded ){
+void handlePhysics(Camera2D& camera, Rectangle& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded ){
 	grounded = false;
+	// Handle gravity, collision
 	player.y += GRAVITY*GetFrameTime();
 	for( int i = 0; i < objects.size(); i ++ ){
 		if( player.x > objects[i].x - player.width                  &&
@@ -73,18 +124,22 @@ void handlePhysics(Camera2D& camera, Rectangle& player, std::vector<Rectangle> o
 			}
 		}
 	}
-}
-//TODO: rewrite this to use new spawnRect function
-void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
-	for( int i = 0; i < buildings; i ++ ){
-		Rectangle obj = { i*spacing + 1500, y, a, b };
-		objects.push_back(obj);
-	}
-}
 
-void spawnRect(std::vector<Rectangle>& objects, float x, float y, int a, int b){
-	Rectangle temp = { x, y, a, b };
-	objects.push_back(temp);
+	// TODO handle bullets
+	for( int i = 0; i < bullets.size(); i ++ ){
+		bullets[i].x += bullets[i].speedX;
+		bullets[i].y += bullets[i].speedY;
+		for( int m = 0; m < objects.size(); m ++ ){
+			if( bullets[i].x > objects[m].x                                 &&
+					bullets[i].x < objects[m].x + objects[m].width  &&
+					bullets[i].y > objects[m].y                     &&
+					bullets[i].y < objects[m].y + objects[m].height ){
+
+				bullets.erase(bullets.begin() + i);
+			}
+		}
+	}
+	
 }
 
 int main() {
@@ -96,6 +151,8 @@ int main() {
 	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;
+	std::vector<Bullet>    bullets;
+
 	objects.push_back(floor);
 
 	genBuildings(objects, 100, 500, 300, 100, 100);
@@ -106,37 +163,30 @@ int main() {
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
 
 	while (!WindowShouldClose()){
-		handleKeyPress(camera, player, grounded);
-		handlePhysics(camera, player, objects, grounded);
+		handleKeyPress(camera, player, objects, bullets, grounded);
+		handlePhysics(camera, player, objects, bullets, grounded);
 
+		// Follow player with camera
 		camera.offset.x = -player.x - GetMouseX()/5 + WIDTH/2;
 		camera.offset.y = -player.y - GetMouseY()/5 + HEIGHT/1.5;
 
-		
-		//if mouse is clicked
-		if( IsMouseButtonPressed(0) ){
-			float temp_x = -camera.offset.x + GetMouseX();
-			float temp_y = -camera.offset.y + GetMouseY();
-			
-			spawnRect(objects, temp_x - 25, temp_y - 25, 50, 50);
-		}
-
-
+		// Draw
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		BeginMode2D(camera);
-		
-		//Draw floor
 		DrawRectangleRec(floor, DARKGRAY);
 		for( int i = 0; i < objects.size(); i ++ ){
 			DrawRectangleRec(objects[i], DARKGRAY);
+		}
+		for( int i = 0; i < bullets.size(); i ++ ){
+			DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 		}
 		DrawRectangleRec(player, RED);
 
 		EndMode2D();
 		EndDrawing();
 	}
-	CloseWindow();        // Close window and OpenGL context
+	CloseWindow();
 
 	return 0;
 }
