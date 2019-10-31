@@ -75,7 +75,10 @@ void handleKeyPress(Camera2D& camera, Rectangle& player, std::vector<Rectangle>&
 	if(IsMouseButtonDown(1)){
 		float temp_x = -camera.offset.x + GetMouseX();
 		float temp_y = -camera.offset.y + GetMouseY();
-		spawnBullet(bullets, player, player.x + player.width/2, player.y + player.height/2, (temp_x - player.x)/10, (temp_y - player.y)/10);
+		float speedX = (temp_x - player.x)/50;
+		float speedY = (temp_y - player.y)/50;
+
+		spawnBullet(bullets, player, player.x + player.width/2, player.y + player.height/2, speedX, speedY);
 
 		if(bullets.size() > 100){
 			bullets.erase(bullets.begin(), bullets.begin()+1);
