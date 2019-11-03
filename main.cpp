@@ -2,19 +2,14 @@
 #include <vector>
 #include <math.h>
 #include "raylib.h"
+#include "game.h"
 
 #define WIDTH    1920
 #define HEIGHT   1080
 #define SPEED    1000
-#define GRAVITY  0
+#define GRAVITY  400
 
 
-struct Bullet {
-	float x;
-	float y;
-	float speedX;
-	float speedY;
-};
 
 
 //TODO: rewrite this to use new spawnRect function
@@ -30,12 +25,12 @@ void spawnRect(std::vector<Rectangle>& objects, float x, float y, int a, int b){
 	objects.push_back(temp);
 }
 
-void spawnBullet(std::vector<Bullet>& bullets, Rectangle& player, float x, float y, float speedX, float speedY){
+void spawnBullet(std::vector<Bullet>& bullets, Player& player, float x, float y, float speedX, float speedY){
 	Bullet bullet = {x, y, speedX, speedY};
 	bullets.push_back(bullet);
 }
 
-void handleKeyPress(Camera2D& camera, Rectangle& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool grounded){
+void handleKeyPress(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool grounded){
 	if (IsKeyDown(KEY_D)){
 		player.x += SPEED*GetFrameTime();
 	//	camera.offset.x -= SPEED*GetFrameTime();
@@ -44,8 +39,8 @@ void handleKeyPress(Camera2D& camera, Rectangle& player, std::vector<Rectangle>&
 		player.x -= SPEED*GetFrameTime();
 	//	camera.offset.x += SPEED*GetFrameTime();
 	}
-	if (IsKeyDown(KEY_W)){
-		player.y -= SPEED*GetFrameTime();
+	if (IsKeyPressed(KEY_W) && grounded){
+		player.y -= SPEED*5*GetFrameTime();
 	}
 	if (IsKeyDown(KEY_S)){
 		player.y += SPEED*GetFrameTime();
@@ -72,11 +67,16 @@ void handleKeyPress(Camera2D& camera, Rectangle& player, std::vector<Rectangle>&
 	}
 
 	// Spawn bullet object
-	if(IsMouseButtonDown(1)){
+	if(IsMouseButtonPressed(1)){
 		float temp_x = -camera.offset.x + GetMouseX();
 		float temp_y = -camera.offset.y + GetMouseY();
 		float speedX = (temp_x - player.x)/50;
 		float speedY = (temp_y - player.y)/50;
+
+		// Fraction speed
+		float fracSpeed = 25/(abs(speedX) + abs(speedY));
+		speedX *= fracSpeed;
+		speedY *= fracSpeed;
 
 		spawnBullet(bullets, player, player.x + player.width/2, player.y + player.height/2, speedX, speedY);
 
@@ -86,7 +86,7 @@ void handleKeyPress(Camera2D& camera, Rectangle& player, std::vector<Rectangle>&
 	}
 	
 }
-void handlePhysics(Camera2D& camera, Rectangle& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded ){
+void handlePhysics(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded ){
 	grounded = false;
 	// Handle gravity, collision
 	player.y += GRAVITY*GetFrameTime();
@@ -128,7 +128,7 @@ void handlePhysics(Camera2D& camera, Rectangle& player, std::vector<Rectangle>& 
 		}
 	}
 
-	// TODO handle bullets
+	// TODO handle bullets better
 	for( int i = 0; i < bullets.size(); i ++ ){
 		bullets[i].x += bullets[i].speedX;
 		bullets[i].y += bullets[i].speedY;
@@ -150,7 +150,7 @@ int main() {
 
 	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
 
-	Rectangle player = { WIDTH/2, HEIGHT/3, 40, 40 };
+	Player player(WIDTH/2, HEIGHT/3, 40, 40);
 	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;
@@ -184,7 +184,7 @@ int main() {
 		for( int i = 0; i < bullets.size(); i ++ ){
 			DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 		}
-		DrawRectangleRec(player, RED);
+		DrawRectangle(player.x, player.y, player.width, player.height, RED);
 
 		EndMode2D();
 		EndDrawing();
