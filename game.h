@@ -8,7 +8,6 @@ struct Bullet {
 	float speedY;
 };
 
-
 class Player {
 	private:
 		float velocity            = 0;
@@ -23,7 +22,13 @@ class Player {
 			height = _height;
 		}
 
-		void handle(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded){
+};
+
+class Game {
+	private:
+		//
+	public:
+		void handleKeyPresses(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded){
 
 			// KEYPRESS
 			if (IsKeyDown(KEY_D)){
@@ -80,7 +85,9 @@ class Player {
 					bullets.erase(bullets.begin(), bullets.begin()+1);
 				}
 			}
+		}
 
+		void handlePhysics(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded){
 
 			// PHYSICS
 			// Handle gravity, collision
@@ -141,5 +148,7 @@ class Player {
 			camera.offset.x = -player.x - GetMouseX()/5 + 1920/2;
 			camera.offset.y = -player.y - GetMouseY()/5 + 1080/1.5;
 		}
+
+
 };
 #endif

@@ -23,6 +23,7 @@ int main() {
 
 	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
 
+	Game game;
 	Player player(WIDTH/2, HEIGHT/3, 40, 40);
 	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
@@ -39,7 +40,8 @@ int main() {
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
 
 	while (!WindowShouldClose()){
-		player.handle(camera, player, objects, bullets, grounded);
+		game.handleKeyPresses(camera, player, objects, bullets, grounded);
+		game.handlePhysics(camera, player, objects, bullets, grounded);
 
 		// Draw
 		BeginDrawing();
