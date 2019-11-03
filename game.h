@@ -149,6 +149,19 @@ class Game {
 			camera.offset.y = -player.y - GetMouseY()/5 + 1080/1.5;
 		}
 
-
+		void handleDraw(std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
+			BeginDrawing();
+			ClearBackground(RAYWHITE);
+			BeginMode2D(camera);
+			for( int i = 0; i < objects.size(); i ++ ){
+				DrawRectangleRec(objects[i], DARKGRAY);
+			}
+			for( int i = 0; i < bullets.size(); i ++ ){
+				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
+			}
+			DrawRectangle(player.x, player.y, player.width, player.height, RED);
+			EndMode2D();
+			EndDrawing();
+		}
 };
 #endif

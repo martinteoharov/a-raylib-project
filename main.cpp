@@ -44,20 +44,7 @@ int main() {
 		game.handlePhysics(camera, player, objects, bullets, grounded);
 
 		// Draw
-		BeginDrawing();
-		ClearBackground(RAYWHITE);
-		BeginMode2D(camera);
-		DrawRectangleRec(floor, DARKGRAY);
-		for( int i = 0; i < objects.size(); i ++ ){
-			DrawRectangleRec(objects[i], DARKGRAY);
-		}
-		for( int i = 0; i < bullets.size(); i ++ ){
-			DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
-		}
-		DrawRectangle(player.x, player.y, player.width, player.height, RED);
-
-		EndMode2D();
-		EndDrawing();
+		game.handleDraw(objects, bullets, camera, player);
 	}
 	CloseWindow();
 
