@@ -16,6 +16,7 @@ class Player {
 		int velocityX           = 0;
 		int velocityY           = 0;
 		bool grounded           = false;
+		bool headedRight        = true;
 		const int accel_speed   = 5;
 		const int max_accel     = 10;
 		const int max_velocity  = 20;
@@ -32,29 +33,39 @@ class Player {
 			x      = _x;
 			y      = _y;
 			width  = _width;
-			height = _height;
+			height = _height - 30;
 			dino = _player;
 		}
 		void drawTexture(){
 			const int frames = 8;
 			if( velocityX > 0 ){
 				DrawTextureRec(dino,
-						Rectangle {currX*(dino.width/8), 0, dino.width/8, dino.height},
+						Rectangle {currX*(dino.width/8) + 40, 40, dino.width/8 - 40, dino.height - 80},
 						Vector2   {x, y},
 						RAYWHITE);	
+				headedRight = true;
 			}
 			else if( velocityX == 0 ) {	
-				DrawTextureRec(dino,
-						Rectangle {0, 0, dino.width/8, dino.height},
-						Vector2   {x, y},
-						RAYWHITE);	
+				if( headedRight ){
+					DrawTextureRec(dino,
+							Rectangle {40, 40, dino.width/8 - 40, dino.height - 80},
+							Vector2   {x, y},
+							RAYWHITE);	
+				}
+				else{
+					DrawTextureRec(dino,
+							Rectangle {dino.width/8 + 40, 40, -dino.width/8 + 40, dino.height - 80},
+							Vector2   {x, y},
+							RAYWHITE);	
+				}
 
 			}
 			else {
 				DrawTextureRec(dino,
-						Rectangle {currX*(dino.width/8) + dino.width/8, 0, -dino.width/8, dino.height},
+						Rectangle {currX*(dino.width/8) + dino.width/8 + 40, 40, -dino.width/8 + 40, dino.height - 80},
 						Vector2   {x, y},
 						RAYWHITE);	
+				headedRight = false;
 			}
 
 			currX == 8 ? currX = 0 : currX++;
