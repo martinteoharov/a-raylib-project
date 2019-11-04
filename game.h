@@ -19,7 +19,7 @@ class Player {
 		const int accel_speed   = 5;
 		const int max_accel     = 10;
 		const int max_velocity  = 20;
-		const int max_jump      = 200;
+		const int max_jump      = 600;
 		const int mass          = 3;
 		int x, y, width, height;
 
@@ -69,7 +69,7 @@ class Player {
 				accelX -= accel_speed;
 			}
 			if (IsKeyPressed(KEY_W) && grounded){
-				accelY -= 10*accel_speed;
+				accelY -= 20*accel_speed;
 				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
@@ -253,13 +253,14 @@ class Game {
 			BeginDrawing();
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
+
+			player.drawTexture();
 			for( int i = 0; i < objects.size(); i ++ ){
 				DrawRectangleRec(objects[i], DARKGRAY);
 			}
 			for( int i = 0; i < bullets.size(); i ++ ){
 				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 			}
-			player.drawTexture();
 
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
 			EndMode2D();
