@@ -17,7 +17,7 @@ class Player {
 		int velocityY           = 0;
 		bool grounded           = false;
 		const int accel_speed   = 5;
-		const int max_accel     = 5;
+		const int max_accel     = 10;
 		const int max_velocity  = 20;
 		const int max_jump      = 200;
 		const int mass          = 3;
@@ -37,7 +37,7 @@ class Player {
 			if (IsKeyDown(KEY_A)){
 				accelX -= accel_speed;
 			}
-			if (IsKeyPressed(KEY_W)){
+			if (IsKeyPressed(KEY_W) && grounded){
 				accelY -= 10*accel_speed;
 				grounded = false;
 			}
@@ -58,7 +58,7 @@ class Player {
 			velocityX < -max_velocity ? velocityX = -max_velocity : NULL;
 			velocityX > max_velocity  ? velocityX =  max_velocity : NULL;
 
-			velocityY > max_jump  ? velocityY = max_jump : NULL;
+			velocityY > max_jump  ? velocityY =  max_jump : NULL;
 			velocityY < -max_jump ? velocityY = -max_jump : NULL;
 
 			velocityX += accelX;
