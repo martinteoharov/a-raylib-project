@@ -15,9 +15,11 @@ class Player {
 		float accelY              = 0;
 		float velocityX           = 0;
 		float velocityY           = 0;
-		const float accel_speed   = 2;
+		const float accel_speed   = 5;
 		const float max_accel     = 5;
+		const float max_jump      = 200;
 		const float max_velocity  = 20;
+		const float mass          = 3;
 		float x, y, width, height;
 		Player(float _x, float _y, float _width, float _height){
 			x      = _x;
@@ -41,12 +43,9 @@ class Game {
 			if (IsKeyDown(KEY_A)){
 				player.accelX -= player.accel_speed;
 			}
-			if (IsKeyDown(KEY_W)){
-				player.accelY -= player.accel_speed;
-	//			grounded = false;
-			}
-			if (IsKeyDown(KEY_S)){
-				player.accelY += player.accel_speed;
+			if (IsKeyPressed(KEY_W)){
+				player.accelY -= 10*player.accel_speed;
+				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
 				player.x = 1000;
@@ -92,14 +91,17 @@ class Game {
 		}
 
 		void handlePhysics(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded){
-
 			// PHYSICS
 			// Handle player movement
+
+
+
+
 			player.velocityX < -player.max_velocity ? player.velocityX = -player.max_velocity : NULL;
 			player.velocityX > player.max_velocity  ? player.velocityX =  player.max_velocity : NULL;
 
-			player.velocityY > player.max_velocity  ? player.velocityY = player.max_velocity : NULL;
-			player.velocityY < -player.max_velocity ? player.velocityY = -player.max_velocity : NULL;
+			player.velocityY > player.max_jump  ? player.velocityY = player.max_jump : NULL;
+			player.velocityY < -player.max_jump ? player.velocityY = -player.max_jump : NULL;
 
 			player.velocityX += player.accelX;
 			player.velocityY += player.accelY;
@@ -108,12 +110,18 @@ class Game {
 			player.y += player.velocityY;
 
 			player.accelX = 0;
-			player.accelY = 0;
+			player.accelY = player.mass;
+
+			player.velocityX = floorf(player.velocityX * 100) / 100;
+			player.velocityY = floorf(player.velocityY * 100) / 100;
 
 			
-			// friction
-	//		player.velocityX > 0 ? player.velocityX -= 0.7 : player.velocityX += 0.7;
-	//		player.velocityY > 0 ? player.velocityY -= 0.7 : player.velocityY += 0.7;
+			// Friction, wiggly jiggly movement of player is because of that
+			(player.velocityX < 2 && player.velocityX > -2) ? player.velocityX = 0 : player.velocityX /= 1.2;
+			(player.velocityY < 2 && player.velocityY > -2) ? player.velocityY = 0 : player.velocityY /= 1.2;
+
+
+			std::cout << player.velocityX << " - " << player.velocityY << std::endl;
 
 
 
