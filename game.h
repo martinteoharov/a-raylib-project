@@ -10,10 +10,14 @@ struct Bullet {
 
 class Player {
 	private:
-		float velocity            = 0;
-		const float accel_speed   = 50;
-		const float max_velocity  = 1000;
 	public:
+		float accelX              = 0;
+		float accelY              = 0;
+		float velocityX           = 0;
+		float velocityY           = 0;
+		const float accel_speed   = 2;
+		const float max_accel     = 5;
+		const float max_velocity  = 20;
 		float x, y, width, height;
 		Player(float _x, float _y, float _width, float _height){
 			x      = _x;
@@ -32,17 +36,17 @@ class Game {
 
 			// KEYPRESS
 			if (IsKeyDown(KEY_D)){
-				player.x += 20;
+				player.accelX += player.accel_speed;
 			}
-			else if (IsKeyDown(KEY_A)){
-				player.x -= 20;
+			if (IsKeyDown(KEY_A)){
+				player.accelX -= player.accel_speed;
 			}
-			if (IsKeyPressed(KEY_W) && grounded){
-				player.y -= 100;
-				grounded = false;
+			if (IsKeyDown(KEY_W)){
+				player.accelY -= player.accel_speed;
+	//			grounded = false;
 			}
 			if (IsKeyDown(KEY_S)){
-				player.y += 20;
+				player.accelY += player.accel_speed;
 			}
 			if (IsKeyDown(KEY_R)){
 				player.x = 1000;
@@ -90,8 +94,31 @@ class Game {
 		void handlePhysics(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, bool& grounded){
 
 			// PHYSICS
-			// Handle gravity, collision
-			player.y += 2;
+			// Handle player movement
+			player.velocityX < -player.max_velocity ? player.velocityX = -player.max_velocity : NULL;
+			player.velocityX > player.max_velocity  ? player.velocityX =  player.max_velocity : NULL;
+
+			player.velocityY > player.max_velocity  ? player.velocityY = player.max_velocity : NULL;
+			player.velocityY < -player.max_velocity ? player.velocityY = -player.max_velocity : NULL;
+
+			player.velocityX += player.accelX;
+			player.velocityY += player.accelY;
+
+			player.x += player.velocityX;
+			player.y += player.velocityY;
+
+			player.accelX = 0;
+			player.accelY = 0;
+
+			
+			// friction
+	//		player.velocityX > 0 ? player.velocityX -= 0.7 : player.velocityX += 0.7;
+	//		player.velocityY > 0 ? player.velocityY -= 0.7 : player.velocityY += 0.7;
+
+
+
+	
+			// Handle collision
 			for( int i = 0; i < objects.size(); i ++ ){
 				if( player.x > objects[i].x - player.width                  &&
 						player.x < objects[i].x + objects[i].width  &&
@@ -116,16 +143,20 @@ class Game {
 					if( ind == 0 ){
 						player.y = objects[i].y - player.height;
 						grounded = true;
+						player.velocityY = 0;
 					}                       
 					if( ind == 1 ){
 						player.y = objects[i].y + objects[i].height;
 						grounded = true;
+						player.velocityY = 0;
 					}                       
 					if( ind == 2 ){
 						player.x = objects[i].x - player.width;
+						player.velocityX = 0;
 					}
 					if( ind == 3 ){
 						player.x = objects[i].x + objects[i].width;
+						player.velocityX = 0;
 					}
 				}        
 			}        
