@@ -22,13 +22,44 @@ class Player {
 		const int max_jump      = 200;
 		const int mass          = 3;
 		int x, y, width, height;
+
+
+		// Texture & Animation
+		Texture2D dino;
+		int currX = 0;
 	public:
-		Player(int _x, int _y, int _width, int _height){
+		Player(int _x, int _y, int _width, int _height, Texture2D _player){
 			x      = _x;
 			y      = _y;
 			width  = _width;
 			height = _height;
+			dino = _player;
 		}
+		void drawTexture(){
+			const int frames = 8;
+			if( velocityX > 0 ){
+				DrawTextureRec(dino,
+						Rectangle {currX*(dino.width/8), 0, dino.width/8, dino.height},
+						Vector2   {x, y},
+						RAYWHITE);	
+			}
+			else if( velocityX == 0 ) {	
+				DrawTextureRec(dino,
+						Rectangle {0, 0, dino.width/8, dino.height},
+						Vector2   {x, y},
+						RAYWHITE);	
+
+			}
+			else {
+				DrawTextureRec(dino,
+						Rectangle {currX*(dino.width/8) + dino.width/8, 0, -dino.width/8, dino.height},
+						Vector2   {x, y},
+						RAYWHITE);	
+			}
+
+			currX == 8 ? currX = 0 : currX++;
+		}
+
 		void handleKeyPresses(std::vector<Rectangle>& objects){
 			// KEYPRESS
 			if (IsKeyDown(KEY_D)){
@@ -228,7 +259,9 @@ class Game {
 			for( int i = 0; i < bullets.size(); i ++ ){
 				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 			}
-			DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
+			player.drawTexture();
+
+			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
 			EndMode2D();
 			EndDrawing();
 		}
