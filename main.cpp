@@ -42,8 +42,6 @@ int main() {
 	while (!WindowShouldClose()){
 		game.handleKeyPresses(camera, player, objects, bullets, grounded);
 		game.handlePhysics(camera, player, objects, bullets, grounded);
-
-		// Draw
 		game.handleDraw(objects, bullets, camera, player);
 	}
 	CloseWindow();

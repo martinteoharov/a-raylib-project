@@ -2,26 +2,26 @@
 #define GAME_H
 
 struct Bullet {
-	float x; 
-	float y;
-	float speedX;
-	float speedY;
+	int x; 
+	int y;
+	int speedX;
+	int speedY;
 };
 
 class Player {
 	private:
 	public:
-		float accelX              = 0;
-		float accelY              = 0;
-		float velocityX           = 0;
-		float velocityY           = 0;
-		const float accel_speed   = 5;
-		const float max_accel     = 5;
-		const float max_jump      = 200;
-		const float max_velocity  = 20;
-		const float mass          = 3;
-		float x, y, width, height;
-		Player(float _x, float _y, float _width, float _height){
+		int accelX              = 0;
+		int accelY              = 0;
+		int velocityX           = 0;
+		int velocityY           = 0;
+		const int accel_speed   = 5;
+		const int max_accel     = 5;
+		const int max_velocity  = 20;
+		const int max_jump      = 200;
+		const int mass          = 3;
+		int x, y, width, height;
+		Player(int _x, int _y, int _width, int _height){
 			x      = _x;
 			y      = _y;
 			width  = _width;
@@ -62,8 +62,8 @@ class Game {
 
 			// Spawn rect object
 			if(IsMouseButtonDown(0)){
-				float temp_x = -camera.offset.x + GetMouseX();
-				float temp_y = -camera.offset.y + GetMouseY();
+				int temp_x = -camera.offset.x + GetMouseX();
+				int temp_y = -camera.offset.y + GetMouseY();
 
 				Rectangle temp = { temp_x, temp_y, 50, 50 };
 				objects.push_back(temp);
@@ -71,17 +71,17 @@ class Game {
 
 			// Spawn bullet object
 			if(IsMouseButtonPressed(1)){
-				float temp_x = -camera.offset.x + GetMouseX();
-				float temp_y = -camera.offset.y + GetMouseY();
-				float speedX = (temp_x - player.x)/50;
-				float speedY = (temp_y - player.y)/50;
+				int temp_x = -camera.offset.x + GetMouseX();
+				int temp_y = -camera.offset.y + GetMouseY();
+				int speedX = (temp_x - player.x)/50;
+				int speedY = (temp_y - player.y)/50;
 
 				// Fraction speed
-				float fracSpeed = 25/(abs(speedX) + abs(speedY));
+				int fracSpeed = 25/(abs(speedX) + abs(speedY));
 				speedX *= fracSpeed;
 				speedY *= fracSpeed;
 
-				Bullet bullet = {player.x, player.y, speedX, speedY};
+				Bullet bullet = {player.x, player.y, speedX + player.velocityX, speedY + player.velocityY};
 				bullets.push_back(bullet);
 
 				if(bullets.size() > 100){
@@ -120,12 +120,6 @@ class Game {
 			(player.velocityX < 2 && player.velocityX > -2) ? player.velocityX = 0 : player.velocityX /= 1.2;
 			(player.velocityY < 2 && player.velocityY > -2) ? player.velocityY = 0 : player.velocityY /= 1.2;
 
-
-			std::cout << player.velocityX << " - " << player.velocityY << std::endl;
-
-
-
-	
 			// Handle collision
 			for( int i = 0; i < objects.size(); i ++ ){
 				if( player.x > objects[i].x - player.width                  &&
