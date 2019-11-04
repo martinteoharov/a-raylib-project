@@ -19,8 +19,6 @@ void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, c
 }
 
 int main() {
-	bool grounded  = false;
-
 	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
 
 	Game game;
@@ -40,8 +38,8 @@ int main() {
 	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
 
 	while (!WindowShouldClose()){
-		game.handleKeyPresses(camera, player, objects, bullets, grounded);
-		game.handlePhysics(camera, player, objects, bullets, grounded);
+		game.handleKeyPresses(camera, player, objects, bullets);
+		game.handlePhysics(camera, player, objects, bullets);
 		game.handleDraw(objects, bullets, camera, player);
 	}
 	CloseWindow();
