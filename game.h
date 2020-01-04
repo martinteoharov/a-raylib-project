@@ -2,7 +2,7 @@
 #define GAME_H
 
 struct Bullet {
-	int x; 
+	int x;
 	int y;
 	int speedX;
 	int speedY;
@@ -16,7 +16,6 @@ class Player {
 		int velocityX           = 0;
 		int velocityY           = 0;
 		bool grounded           = false;
-		bool headedRight        = true;
 		const int accel_speed   = 5;
 		const int max_accel     = 10;
 		const int max_velocity  = 20;
@@ -26,49 +25,32 @@ class Player {
 
 
 		// Texture & Animation
-		Texture2D dino;
-		int currX = 0;
+		Texture2D texture;
 	public:
 		Player(int _x, int _y, int _width, int _height, Texture2D _player){
 			x      = _x;
 			y      = _y;
 			width  = _width;
-			height = _height - 30;
-			dino = _player;
+			height = _height;
+			texture = _player;
 		}
-		void drawTexture(){
-			const int frames = 8;
-			if( velocityX > 0 ){
-				DrawTextureRec(dino,
-						Rectangle {currX*(dino.width/8) + 40, 40, dino.width/8 - 40, dino.height - 80},
-						Vector2   {x, y},
-						RAYWHITE);	
-				headedRight = true;
-			}
-			else if( velocityX == 0 ) {	
-				if( headedRight ){
-					DrawTextureRec(dino,
-							Rectangle {40, 40, dino.width/8 - 40, dino.height - 80},
-							Vector2   {x, y},
-							RAYWHITE);	
-				}
-				else{
-					DrawTextureRec(dino,
-							Rectangle {dino.width/8 + 40, 40, -dino.width/8 + 40, dino.height - 80},
-							Vector2   {x, y},
-							RAYWHITE);	
-				}
+		void drawRun(int headed, int& currRun){
+			const int frames = 5;
+			const int startPos = 9;
+			if(currRun > frames ) currRun = 0;
 
-			}
-			else {
-				DrawTextureRec(dino,
-						Rectangle {currX*(dino.width/8) + dino.width/8 + 40, 40, -dino.width/8 + 40, dino.height - 80},
+			if(headed == 1){
+				DrawTextureRec(texture,
+						Rectangle {(currRun+startPos)*width, 0, width, height},
 						Vector2   {x, y},
-						RAYWHITE);	
-				headedRight = false;
+						RAYWHITE);
 			}
-
-			currX == 8 ? currX = 0 : currX++;
+			else if(headed == -1){
+				DrawTextureRec(texture,
+						Rectangle {(currRun+startPos)*width, 0, -width, height},
+						Vector2   {x, y},
+						RAYWHITE);
+			}
 		}
 
 		void handleKeyPresses(std::vector<Rectangle>& objects){
@@ -85,15 +67,15 @@ class Player {
 			}
 			if (IsKeyDown(KEY_R)){
 				x = 1000;
-				y = 500; 
+				y = 500;
 				// Erase pasted objects
 				for( int i = 0; i < objects.size(); i ++ ){
 					objects.erase(objects.begin() + 1 + 100, objects.begin() + objects.size());
 				}
-			}        
+			}
 			if (IsKeyDown(KEY_R)){
 				x = 1000;
-				y = 500; 
+				y = 500;
 			}
 		}
 		void handlePhysics(){
@@ -112,7 +94,7 @@ class Player {
 			// Apply gravity
 			accelX = 0;
 			accelY = mass;
-			
+
 			// Apply friction
 			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= 1.2;
 			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= 1.2;
@@ -155,7 +137,10 @@ class Player {
 
 class Game {
 	private:
-		//
+		double time = GetTime();
+		double prevTime = 0;
+		int    animRun  = 0;
+		int    animRunSpeed = 10;
 	public:
 		void handleKeyPresses(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
 
@@ -171,6 +156,7 @@ class Game {
 			}
 
 			// Spawn bullet object
+			// TODO: Fix trajectory
 			if(IsMouseButtonPressed(1)){
 				int temp_x = -camera.offset.x + GetMouseX();
 				int temp_y = -camera.offset.y + GetMouseY();
@@ -213,7 +199,7 @@ class Game {
 
 
 					int s = 10000;
-					int ind;      
+					int ind;
 					for( int i = 0; i < 4; i ++ ){
 						abs(side[i]) < s ? (s = abs(side[i]), ind = i) : NULL;
 					}
@@ -222,12 +208,12 @@ class Game {
 						player.setY(objects[i].y - player.getH());
 						player.setGrounded(true);
 						player.setVelY(0);
-					}                       
+					}
 					if( ind == 1 ){
 						player.setY(objects[i].y + objects[i].height);
 						player.setGrounded(true);
 						player.setVelY(0);
-					}                       
+					}
 					if( ind == 2 ){
 						player.setX(objects[i].x - player.getW());
 						player.setVelX(0);
@@ -236,8 +222,8 @@ class Game {
 						player.setX(objects[i].x + objects[i].width);
 						player.setVelX(0);
 					}
-				}        
-			}        
+				}
+			}
 
 			// Handle bullets
 			for( int i = 0; i < bullets.size(); i ++ ){
@@ -256,6 +242,7 @@ class Game {
 					}
 				}
 			}
+
 			camera.offset.x = -player.getX() - GetMouseX()/5 + 1920/2;
 			camera.offset.y = -player.getY() - GetMouseY()/5 + 1080/1.5;
 		}
@@ -265,7 +252,15 @@ class Game {
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
 
-			player.drawTexture();
+			int headed = player.getVelX();
+			headed > 0 ? headed = 1 : headed = -1;
+			time = GetTime();
+			if(time > prevTime + (1.0/animRunSpeed)){
+				animRun ++;
+				prevTime = time;
+			}
+			player.drawRun(headed, animRun);
+			
 			for( int i = 0; i < objects.size(); i ++ ){
 				DrawRectangleRec(objects[i], DARKGRAY);
 			}

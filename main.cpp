@@ -22,8 +22,8 @@ int main() {
 	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
 
 	Game game;
-	Texture2D dino = LoadTexture("./resources/textures/dino_walk_normal4.png");
-	Player player(WIDTH/2, HEIGHT/3, dino.width/8 - 40, dino.height - 50, dino);
+	Texture2D texture = LoadTexture("./resources/textures/adventurer.png");
+	Player player(WIDTH/2, HEIGHT/3, texture.width/21, texture.height, texture);
 	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;
