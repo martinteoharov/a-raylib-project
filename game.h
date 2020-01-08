@@ -11,6 +11,11 @@ struct Bullet {
 // Rewrite handle movement function to be here
 class Player {
 	private:
+		double time     = GetTime();
+		double prevTime         = 0;
+		int prevHeaded          = 1;
+		int animSpeed           = 10;
+		int currFrame           = 0;
 		int accelX              = 0;
 		int accelY              = 0;
 		int velocityX           = 0;
@@ -23,6 +28,30 @@ class Player {
 		const int mass          = 3;
 		int x, y, width, height;
 
+		
+
+		void drawRun(int headed, int currFrame){
+			const int frames = 5;
+			const int startPos = 9;
+			int frame = currFrame % frames;
+
+			DrawTextureRec(texture,
+					Rectangle {(frame+startPos)*width, 0, headed*width, height},
+					Vector2   {x, y},
+					RAYWHITE);
+		}
+		void drawFixed(int headed, int currFrame){
+			const int frames = 4;
+			const int startPos = 0;
+			int frame = currFrame % frames;
+
+			DrawTextureRec(texture,
+					Rectangle {(frame+startPos)*width, 0, prevHeaded*width, height},
+					Vector2   {x, y},
+					RAYWHITE);
+
+		}
+
 
 		// Texture & Animation
 		Texture2D texture;
@@ -34,23 +63,16 @@ class Player {
 			height = _height;
 			texture = _player;
 		}
-		void drawRun(int headed, int& currRun){
-			const int frames = 5;
-			const int startPos = 9;
-			if(currRun > frames ) currRun = 0;
-
-			if(headed == 1){
-				DrawTextureRec(texture,
-						Rectangle {(currRun+startPos)*width, 0, width, height},
-						Vector2   {x, y},
-						RAYWHITE);
+		void animation(){
+			time = GetTime();
+			if(time > prevTime + (1.0/animSpeed)){
+				prevTime = time;
+				currFrame ++;
 			}
-			else if(headed == -1){
-				DrawTextureRec(texture,
-						Rectangle {(currRun+startPos)*width, 0, -width, height},
-						Vector2   {x, y},
-						RAYWHITE);
-			}
+			int headed = velocityX;
+			if(headed > 0) {headed = 1; prevHeaded = 1;}
+			if(headed < 0) {headed = -1; prevHeaded = -1;}
+			headed != 0 ? drawRun(headed, currFrame) : drawFixed(prevHeaded, currFrame);
 		}
 
 		void handleKeyPresses(std::vector<Rectangle>& objects){
@@ -137,10 +159,6 @@ class Player {
 
 class Game {
 	private:
-		double time = GetTime();
-		double prevTime = 0;
-		int    animRun  = 0;
-		int    animRunSpeed = 10;
 	public:
 		void handleKeyPresses(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
 
@@ -158,15 +176,16 @@ class Game {
 			// Spawn bullet object
 			// TODO: Fix trajectory
 			if(IsMouseButtonPressed(1)){
-				int temp_x = -camera.offset.x + GetMouseX();
-				int temp_y = -camera.offset.y + GetMouseY();
-				int speedX = (temp_x - player.getX())/50;
-				int speedY = (temp_y - player.getY())/50;
+				double temp_x = -camera.offset.x + GetMouseX();
+				double temp_y = -camera.offset.y + GetMouseY();
 
-				// Fraction speed
-				int fracSpeed = 25/(abs(speedX) + abs(speedY));
-				speedX *= fracSpeed;
-				speedY *= fracSpeed;
+				double speedX = (temp_x - player.getX());
+				double speedY = (temp_y - player.getY());
+
+				double norm = sqrt(speedX*speedX + speedY*speedY);
+				std::cout << speedX << " - " << norm << std::endl;
+				speedX /= (norm/10);
+				speedY /= (norm/10);
 
 				Bullet bullet = {player.getX(), player.getY(), speedX + player.getVelX(), speedY + player.getVelY()};
 				bullets.push_back(bullet);
@@ -251,15 +270,7 @@ class Game {
 			BeginDrawing();
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
-
-			int headed = player.getVelX();
-			headed > 0 ? headed = 1 : headed = -1;
-			time = GetTime();
-			if(time > prevTime + (1.0/animRunSpeed)){
-				animRun ++;
-				prevTime = time;
-			}
-			player.drawRun(headed, animRun);
+			player.animation();
 			
 			for( int i = 0; i < objects.size(); i ++ ){
 				DrawRectangleRec(objects[i], DARKGRAY);
