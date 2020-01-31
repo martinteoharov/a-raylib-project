@@ -11,33 +11,42 @@ struct Bullet {
 // Rewrite handle movement function to be here
 class Player {
 	private:
+		// used in animation
 		double time     = GetTime();
 		double prevTime         = 0;
 		int prevHeaded          = 1;
 		int animSpeed           = 10;
 		int currFrame           = 0;
-		int accelX              = 0;
-		int accelY              = 0;
-		int velocityX           = 0;
-		int velocityY           = 0;
+
+		// character velocity
 		bool grounded           = false;
-		const int accel_speed   = 5;
-		const int max_accel     = 10;
-		const int max_velocity  = 20;
-		const int max_jump      = 600;
-		const int mass          = 3;
-		int x, y, width, height;
+		float accelX              = 0;
+		float accelY              = 0;
+		float velocityX           = 0;
+		float velocityY           = 0;
+		const float accel_speed   = 5;
+		const float max_accel     = 10;
+		const float max_velocity  = 15;
+		const float max_jump      = 600;
+		const float mass          = 2.5;
+		const float frictionX     = 1.4;
+		const float frictionY     = 1.2;
+		int x, y, width, height, widthTex, heightTex;
 
 		
+		// Texture & Animation
+		Texture2D texture;
 
 		void drawRun(int headed, int currFrame){
 			const int frames = 5;
 			const int startPos = 9;
 			int frame = currFrame % frames;
 
-			DrawTextureRec(texture,
-					Rectangle {(frame+startPos)*width, 0, headed*width, height},
-					Vector2   {x, y},
+			DrawTexturePro(texture,
+					Rectangle {(frame+startPos)*widthTex, 0, headed*widthTex, heightTex},
+					Rectangle {x, y, width, height},
+					Vector2   {0, 0},
+					0.0f,
 					RAYWHITE);
 		}
 		void drawFixed(int headed, int currFrame){
@@ -45,23 +54,23 @@ class Player {
 			const int startPos = 0;
 			int frame = currFrame % frames;
 
-			DrawTextureRec(texture,
-					Rectangle {(frame+startPos)*width, 0, prevHeaded*width, height},
-					Vector2   {x, y},
+			DrawTexturePro(texture,
+					Rectangle {(frame+startPos)*widthTex, 0, prevHeaded*widthTex, heightTex},
+					Rectangle {x, y, width, height},
+					Vector2   {0, 0},
+					0.0f,
 					RAYWHITE);
 
 		}
-
-
-		// Texture & Animation
-		Texture2D texture;
 	public:
-		Player(int _x, int _y, int _width, int _height, Texture2D _player){
-			x      = _x;
-			y      = _y;
-			width  = _width;
-			height = _height;
-			texture = _player;
+		Player(int _x, int _y, int _widthTex, int _heightTex, int _width, int _height, Texture2D _player){
+			x         = _x;
+			y         = _y;
+			widthTex  = _widthTex;
+			heightTex = _heightTex;
+			width     = _width;
+			height    = _height;
+			texture   = _player;
 		}
 		void animation(){
 			time = GetTime();
@@ -84,7 +93,7 @@ class Player {
 				accelX -= accel_speed;
 			}
 			if (IsKeyPressed(KEY_W) && grounded){
-				accelY -= 20*accel_speed;
+				accelY -= 10*accel_speed;
 				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
@@ -118,8 +127,8 @@ class Player {
 			accelY = mass;
 
 			// Apply friction
-			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= 1.2;
-			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= 1.2;
+			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= frictionX;
+			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= frictionY;
 		}
 		int getX(){
 			return x;
@@ -166,8 +175,8 @@ class Game {
 
 			// Spawn rect object
 			if(IsMouseButtonDown(0)){
-				int temp_x = -camera.offset.x + GetMouseX();
-				int temp_y = -camera.offset.y + GetMouseY();
+				int temp_x = -camera.offset.x/camera.zoom + GetMouseX()/camera.zoom;
+				int temp_y = -camera.offset.y/camera.zoom + GetMouseY()/camera.zoom;
 
 				Rectangle temp = { temp_x, temp_y, 50, 50 };
 				objects.push_back(temp);
@@ -176,24 +185,24 @@ class Game {
 			// Spawn bullet object
 			// TODO: Fix trajectory
 			if(IsMouseButtonPressed(1)){
-				double temp_x = -camera.offset.x + GetMouseX();
-				double temp_y = -camera.offset.y + GetMouseY();
+				float temp_x = GetMouseX()/camera.zoom - camera.offset.x/camera.zoom;
+				float temp_y = GetMouseY()/camera.zoom - camera.offset.y/camera.zoom;
 
-				double speedX = (temp_x - player.getX());
-				double speedY = (temp_y - player.getY());
+				float speedX = (temp_x - player.getX());
+				float speedY = (temp_y - player.getY());
 
-				double norm = sqrt(speedX*speedX + speedY*speedY);
-				std::cout << speedX << " - " << norm << std::endl;
-				speedX /= (norm/10);
-				speedY /= (norm/10);
+				float norm = sqrt(speedX*speedX + speedY*speedY);
+				speedX /= (norm/10.0f);
+				speedY /= (norm/10.0f);
 
-				Bullet bullet = {player.getX(), player.getY(), speedX + player.getVelX(), speedY + player.getVelY()};
+				Bullet bullet = {player.getX(), player.getY(), speedX, speedY};
 				bullets.push_back(bullet);
 
 				if(bullets.size() > 100){
 					bullets.erase(bullets.begin(), bullets.begin()+1);
 				}
 			}
+			camera.zoom += GetMouseWheelMove()/10.0f;
 		}
 
 		void handlePhysics(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
@@ -215,31 +224,31 @@ class Game {
 					side[2] = player.getX() - objects[i].x + player.getW();
 					side[3] = player.getX() - objects[i].x - objects[i].width;
 
-
-
 					int s = 10000;
 					int ind;
+					// Handle obj collisions
 					for( int i = 0; i < 4; i ++ ){
 						abs(side[i]) < s ? (s = abs(side[i]), ind = i) : NULL;
 					}
-
-					if( ind == 0 ){
-						player.setY(objects[i].y - player.getH());
-						player.setGrounded(true);
-						player.setVelY(0);
-					}
-					if( ind == 1 ){
-						player.setY(objects[i].y + objects[i].height);
-						player.setGrounded(true);
-						player.setVelY(0);
-					}
-					if( ind == 2 ){
-						player.setX(objects[i].x - player.getW());
-						player.setVelX(0);
-					}
-					if( ind == 3 ){
-						player.setX(objects[i].x + objects[i].width);
-						player.setVelX(0);
+					switch (ind){
+						case 0:
+							player.setY(objects[i].y - player.getH());
+							player.setGrounded(true);
+							player.setVelY(0);
+							break;
+						case 1:
+							player.setY(objects[i].y + objects[i].height);
+							player.setGrounded(true);
+							player.setVelY(0);
+							break;
+						case 2:
+							player.setX(objects[i].x - player.getW());
+							player.setVelX(0);
+							break;
+						case 3:
+							player.setX(objects[i].x + objects[i].width);
+							player.setVelX(0);
+							break;
 					}
 				}
 			}
@@ -262,8 +271,8 @@ class Game {
 				}
 			}
 
-			camera.offset.x = -player.getX() - GetMouseX()/5 + 1920/2;
-			camera.offset.y = -player.getY() - GetMouseY()/5 + 1080/1.5;
+			camera.offset.x = (-player.getX() - GetMouseX()/5 + 1920/3/camera.zoom)*camera.zoom;
+			camera.offset.y = (-player.getY() - GetMouseY()/5 + 1080/2/camera.zoom)*camera.zoom;
 		}
 
 		void handleDraw(std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
@@ -278,6 +287,8 @@ class Game {
 			for( int i = 0; i < bullets.size(); i ++ ){
 				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 			}
+			DrawFPS(-camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 10);
+
 
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
 			EndMode2D();
