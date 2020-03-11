@@ -1,14 +1,20 @@
+//cout
 #include <iostream>
+//vector
 #include <vector>
+//trigonometry
 #include <math.h>
+
 #include "raylib.h"
+#include "utils.h"
+#include "player.h"
 #include "game.h"
 
+//set these with command line arguments
 #define WIDTH    1920
 #define HEIGHT   1080
 #define SPEED    1000
 #define GRAVITY  400
-
 
 //TODO: rewrite this to use new spawnRect function
 void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
@@ -23,7 +29,8 @@ int main() {
 
 	Game game;
 	Texture2D texture = LoadTexture("./resources/textures/adventurer.png");
-	Player player(WIDTH/2, HEIGHT/3, texture.width/21, texture.height, texture.width/21, texture.height, texture);
+	//            pos X    pos Y     width of texture  height of texture  width             height          texture
+	Player player(WIDTH/2, HEIGHT/3, texture.width/21, texture.height,    texture.width/21, texture.height, texture);
 	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;
@@ -31,12 +38,13 @@ int main() {
 
 	objects.push_back(floor);
 
+	//generate map terrain
 	genBuildings(objects, 100, 500, 300, 100, 100);
 
 	Camera2D camera = {{ 0 }, {0, 0}, 0.0f, 0.0f };
-	camera.zoom = 3.0f;
+	camera.zoom = 1.0f;
 
-	SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
+	SetTargetFPS(60);
 
 	while (!WindowShouldClose()){
 		game.handleKeyPresses(camera, player, objects, bullets);
