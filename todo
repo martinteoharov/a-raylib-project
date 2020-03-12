@@ -1,0 +1,47 @@
+TODO:
+
+
+-------------------------------------------------------------------------------------------------------------------
+|                                                 Not Started                                                     |
+-------------------------------------------------------------------------------------------------------------------
+
+
+	GUI
+
+	Map Creator
+
+	Player animations
+
+	Gun animations
+
+	Weapon physics - push back and recoil
+
+	Tweak player controls https://www.youtube.com/watch?v=yorTG9at90g&t=8s
+
+	Fix for time dilation - In short make it so FPS doesn't change velocity of objects
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+|                                                 In Progress                                                     |
+-------------------------------------------------------------------------------------------------------------------
+
+
+	Handle objects with a map array for faster collision detection - 
+	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+|                                                    Done                                                         |
+-------------------------------------------------------------------------------------------------------------------
+
+
+	Bullet trajectory fix
