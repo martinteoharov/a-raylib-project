@@ -11,8 +11,8 @@
 #include "game.h"
 
 //set these with command line arguments
-#define WIDTH    1920
-#define HEIGHT   1080
+#define WIDTH    1366
+#define HEIGHT   768
 #define SPEED    1000
 #define GRAVITY  400
 

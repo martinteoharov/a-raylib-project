@@ -8,6 +8,7 @@ struct Bullet {
 	float speedY;
 };
 
+
 class Game {
 	private:
 	public:
@@ -130,7 +131,10 @@ class Game {
 			for( int i = 0; i < bullets.size(); i ++ ){
 				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 			}
-			DrawFPS(-camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 10);
+			std::string sText = "FPS: " + std::to_string(GetFPS()) + "\n" + "velocityX:" + std::to_string(player.getVelX()) + " velocityY:" + std::to_string(player.getVelY()) + '\n' + "accelX:" + std::to_string(player.getAccelX()) + " accelY:" + std::to_string(player.getAccelY());
+			const char *cText = sText.c_str();
+			DrawText(cText, -camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 10, 20, GREEN);
+
 
 
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);

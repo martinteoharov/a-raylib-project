@@ -6,8 +6,8 @@ class Player {
 		double time             = GetTime();
 		double prevTime         = 0;
 		double frameTime        = GetFrameTime();
+		const int animSpeed     = 10;
 		int prevHeaded          = 1;
-		int animSpeed           = 10;
 		int currFrame           = 0;
 
 		// character velocity
@@ -18,7 +18,7 @@ class Player {
 		float velocityY           = 0;
 		const float accel_speed   = 5;
 		const float max_accel     = 10;
-		const float max_velocity  = 15;
+		const float max_velocity  = 40;
 		const float max_jump      = 600;
 		const float mass          = 2.5;
 		const float frictionX     = 1.4;
@@ -98,6 +98,17 @@ class Player {
 			}
 		}
 		void handlePhysics(){
+			// Apply gravity
+			// obsolete for now (because accelX never reaches max_accel) but don't remove
+			accelX > max_accel ? accelX = max_accel : NULL;
+			accelX < -max_accel ? accelX = -max_accel : NULL;
+
+			// lower val in (accelX /= val) = more slippery
+			accelX > 1 || accelX < -1 ? accelX /= 1.5 : accelX = 0;
+
+			velocityX += accelX;
+			velocityY += accelY;
+
 			//check if velocity has passed max_velocity in either direction and correct for it
 			velocityX < -max_velocity ? velocityX = -max_velocity : NULL;
 			velocityX > max_velocity  ? velocityX =  max_velocity : NULL;
@@ -106,21 +117,13 @@ class Player {
 			velocityY > max_jump  ? velocityY =  max_jump : NULL;
 			velocityY < -max_jump ? velocityY = -max_jump : NULL;
 
-			velocityX += accelX;
-			velocityY += accelY;
+			// Apply friction && gravity
+			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= frictionX;
+			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= frictionY;
+			accelY = mass;
 
 			x += velocityX;
 			y += velocityY;
-
-			// Apply gravity
-			if( accelX > max_accel ) accelX = max_accel;
-			if( accelX < -max_accel ) accelX = -max_accel;
-			accelX = 0;
-			accelY = mass;
-
-			// Apply friction
-			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= frictionX;
-			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= frictionY;
 		}
 		int getX(){
 			return x;
@@ -139,6 +142,12 @@ class Player {
 		}
 		int getVelY(){
 			return velocityY;
+		}
+		int getAccelX(){
+			return accelX;
+		}
+		int getAccelY(){
+			return accelY;
 		}
 		void setVelX(int vel){
 			velocityX = vel;
