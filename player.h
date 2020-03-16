@@ -1,3 +1,5 @@
+#include "constants.h"
+
 #ifndef PLAYER_H
 #define PLAYER_H
 class Player {
@@ -89,8 +91,8 @@ class Player {
 				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
-				x = 1000;
-				y = 500;
+				x = WIDTH/2;
+				y = HEIGHT/3;
 				// Erase pasted objects
 				for( int i = 0; i < objects.size(); i ++ ){
 					objects.erase(objects.begin() + 1 + 100, objects.begin() + objects.size());
