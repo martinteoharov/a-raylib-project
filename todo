@@ -18,8 +18,8 @@ TODO:
 
 	Tweak player controls https://www.youtube.com/watch?v=yorTG9at90g&t=8s
 
-	Fix for time dilation - In short make it so FPS doesn't change velocity of objects
-
+	Handle objects with a map array for faster collision detection - 
+	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
 
 
 
@@ -31,8 +31,8 @@ TODO:
 -------------------------------------------------------------------------------------------------------------------
 
 
-	Handle objects with a map array for faster collision detection - 
-	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
+	Fix for time dilation - In short make it so FPS doesn't change velocity of objects
+
 
 
 

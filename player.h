@@ -5,7 +5,6 @@ class Player {
 		// used in animation
 		double time             = GetTime();
 		double prevTime         = 0;
-		double frameTime        = GetFrameTime();
 		const int animSpeed     = 10;
 		int prevHeaded          = 1;
 		int currFrame           = 0;
@@ -23,7 +22,7 @@ class Player {
 		const float mass          = 2.5;
 		const float frictionX     = 1.4;
 		const float frictionY     = 1.2;
-		int x, y, width, height, widthTex, heightTex;
+		float x, y, width, height, widthTex, heightTex;
 
 
 		// Texture & Animation
@@ -85,7 +84,7 @@ class Player {
 				accelX -= accel_speed;
 			}
 			if (IsKeyPressed(KEY_W) && grounded){
-				accelY -= 10*accel_speed;
+				accelY -= 2*accel_speed;
 				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
@@ -98,8 +97,11 @@ class Player {
 			}
 		}
 		void handlePhysics(){
+
 			// Apply gravity
 			// obsolete for now (because accelX never reaches max_accel) but don't remove
+			//accelY = 0;
+
 			accelX > max_accel ? accelX = max_accel : NULL;
 			accelX < -max_accel ? accelX = -max_accel : NULL;
 
@@ -113,17 +115,23 @@ class Player {
 			velocityX < -max_velocity ? velocityX = -max_velocity : NULL;
 			velocityX > max_velocity  ? velocityX =  max_velocity : NULL;
 
-			//check if velocity has passed max_velocity in either direction and correct for it
-			velocityY > max_jump  ? velocityY =  max_jump : NULL;
-			velocityY < -max_jump ? velocityY = -max_jump : NULL;
-
 			// Apply friction && gravity
 			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= frictionX;
 			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= frictionY;
-			accelY = mass;
 
-			x += velocityX;
-			y += velocityY;
+			float frameTime = float(GetFrameTime());
+			float fps = (1.0f/frameTime);
+			float timeDillate = fps / 60.0f;
+
+			if(!grounded) accelY += 0.1*accel_speed;
+			else          accelY = 2;
+
+
+
+			x += int(velocityX/timeDillate);
+			y += float(velocityY/timeDillate);
+
+			std::cout << velocityX << " - " << x << std::endl;
 		}
 		int getX(){
 			return x;
