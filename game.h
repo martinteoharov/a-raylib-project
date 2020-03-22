@@ -1,3 +1,4 @@
+#include "constants.h"
 #ifndef GAME_H
 #define GAME_H
 
@@ -115,8 +116,8 @@ class Game {
 				}
 			}
 
-			camera.offset.x = (-player.getX() - GetMouseX()/5 + 1920/3/camera.zoom)*camera.zoom;
-			camera.offset.y = (-player.getY() - GetMouseY()/5 + 1080/2/camera.zoom)*camera.zoom;
+			camera.offset.x = (-player.getX() - GetMouseX()/5 + WIDTH/3/camera.zoom)*camera.zoom;
+			camera.offset.y = (-player.getY() - GetMouseY()/5 + HEIGHT/2/camera.zoom)*camera.zoom;
 		}
 
 		void handleDraw(std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
@@ -124,7 +125,7 @@ class Game {
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
 			player.animation();
-			
+
 			for( int i = 0; i < objects.size(); i ++ ){
 				DrawRectangleRec(objects[i], DARKGRAY);
 			}

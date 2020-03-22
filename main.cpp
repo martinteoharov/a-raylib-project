@@ -9,12 +9,7 @@
 #include "utils.h"
 #include "player.h"
 #include "game.h"
-
-//set these with command line arguments
-#define WIDTH    1366
-#define HEIGHT   768
-#define SPEED    1000
-#define GRAVITY  400
+#include "constants.h"
 
 //TODO: rewrite this to use new spawnRect function
 void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
