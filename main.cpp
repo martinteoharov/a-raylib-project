@@ -24,8 +24,8 @@ int main() {
 
 	Game game;
 	Texture2D texture = LoadTexture("./resources/textures/adventurer.png");
-	//            pos X    pos Y         width of texture  height of texture  width             height          texture
-	Player player(100, 400,    float( texture.width/21), float(texture.height),    float(texture.width/21), float(texture.height), texture);
+	//            pos X    pos Y         width of texture          height of texture         width                    height                 texture
+	Player player(100,     400,          float( texture.width/21), float(texture.height),    float(texture.width/10), float(texture.height*2), texture);
 	Rectangle floor  = { -100, HEIGHT/2 + 40, 10000, 50 };
 
 	std::vector<Rectangle> objects;

@@ -26,7 +26,6 @@ class Player {
 		const float frictionX     = 4;
 		float x, y, width, height, widthTex, heightTex;
 
-
 		// Texture & Animation
 		Texture2D texture;
 
@@ -53,7 +52,30 @@ class Player {
 					Vector2   {0, 0},
 					0.0f,
 					RAYWHITE);
+		}
+		void drawJump(int headed, int currFrame){
+			const int frames = 2;
+			const int startPos = 14;
+			int frame = currFrame % frames;
 
+			DrawTexturePro(texture,
+					Rectangle {(frame+startPos)*widthTex, 0, prevHeaded*widthTex, heightTex},
+					Rectangle {x, y, width, height},
+					Vector2   {0, 0},
+					0.0f,
+					RAYWHITE);
+		}
+		void drawFall(int headed, int currFrame){
+			const int frames = 2;
+			const int startPos = 16;
+			int frame = currFrame % frames;
+
+			DrawTexturePro(texture,
+					Rectangle {(frame+startPos)*widthTex, 0, prevHeaded*widthTex, heightTex},
+					Rectangle {x, y, width, height},
+					Vector2   {0, 0},
+					0.0f,
+					RAYWHITE);
 		}
 	public:
 		Player(int _x, int _y, int _widthTex, int _heightTex, int _width, int _height, Texture2D _player){
@@ -74,7 +96,15 @@ class Player {
 			int headed = velocityX;
 			if(headed > 0) {headed = 1; prevHeaded = 1;}
 			if(headed < 0) {headed = -1; prevHeaded = -1;}
-			headed != 0 ? drawRun(headed, currFrame) : drawFixed(prevHeaded, currFrame);
+			if(velocityY < -1){
+				drawJump(headed, currFrame);
+			}
+			else if(velocityY > 2){
+				drawFall(headed, currFrame);
+			}
+			else{
+				headed != 0 ? drawRun(headed, currFrame) : drawFixed(prevHeaded, currFrame);
+			}
 		}
 
 		void handleKeyPresses(std::vector<Rectangle>& objects){
