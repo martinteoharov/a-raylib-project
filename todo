@@ -6,11 +6,7 @@ TODO:
 -------------------------------------------------------------------------------------------------------------------
 
 
-	GUI
-
 	Map Creator
-
-	Player animations
 
 	Gun animations
 
@@ -21,8 +17,7 @@ TODO:
 	Handle objects with a map array for faster collision detection - 
 	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
 
-
-
+	Time dilation bug - jumps are messed up
 
 
 
@@ -31,8 +26,9 @@ TODO:
 -------------------------------------------------------------------------------------------------------------------
 
 
-	Fix for time dilation - In short make it so FPS doesn't change velocity of objects
+	GUI
 
+	Player animations
 
 
 
@@ -44,4 +40,5 @@ TODO:
 -------------------------------------------------------------------------------------------------------------------
 
 
-	Bullet trajectory fix
+2020-03-11      Bullet trajectory fix
+2020-03-23	Fix for time dilation - In short make it so FPS doesn't change velocity of objects

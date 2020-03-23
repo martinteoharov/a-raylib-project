@@ -17,13 +17,13 @@ class Player {
 		float accelY              = 0;
 		float velocityX           = 0;
 		float velocityY           = 0;
-		const float accel_speed   = 5;
-		const float max_accel     = 10;
-		const float max_velocity  = 40;
-		const float max_jump      = 600;
-		const float mass          = 2.5;
-		const float frictionX     = 1.4;
-		const float frictionY     = 1.2;
+		const float forceX        = 200;
+		const float forceY        = 20;
+		const float gravity       = 1.1;
+		const float max_velocity  = 20;
+
+		//higher is lower
+		const float frictionX     = 4;
 		float x, y, width, height, widthTex, heightTex;
 
 
@@ -78,15 +78,17 @@ class Player {
 		}
 
 		void handleKeyPresses(std::vector<Rectangle>& objects){
+			float dt = GetFrameTime() * 60;
+			accelX = 0;
 			// KEYPRESS
 			if (IsKeyDown(KEY_D)){
-				accelX += accel_speed;
+				accelX = forceX * dt;
 			}
 			if (IsKeyDown(KEY_A)){
-				accelX -= accel_speed;
+				accelX = -forceX * dt;
 			}
 			if (IsKeyPressed(KEY_W) && grounded){
-				accelY -= 2*accel_speed;
+				velocityY = -forceY;
 				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
@@ -99,41 +101,25 @@ class Player {
 			}
 		}
 		void handlePhysics(){
+			float dt = GetFrameTime() * 60;
+			float friction;
 
-			// Apply gravity
-			// obsolete for now (because accelX never reaches max_accel) but don't remove
-			//accelY = 0;
-
-			accelX > max_accel ? accelX = max_accel : NULL;
-			accelX < -max_accel ? accelX = -max_accel : NULL;
-
-			// lower val in (accelX /= val) = more slippery
-			accelX > 1 || accelX < -1 ? accelX /= 1.5 : accelX = 0;
+			x += int(velocityX);
+			y += int(velocityY);
 
 			velocityX += accelX;
 			velocityY += accelY;
 
+			// Apply gravity
+			accelY += gravity * dt;
+			if(accelY > gravity * dt) accelY = gravity * dt;
+
 			//check if velocity has passed max_velocity in either direction and correct for it
-			velocityX < -max_velocity ? velocityX = -max_velocity : NULL;
-			velocityX > max_velocity  ? velocityX =  max_velocity : NULL;
+			velocityX < -max_velocity*dt ? velocityX = -max_velocity*dt : NULL;
+			velocityX > max_velocity*dt  ? velocityX =  max_velocity*dt : NULL;
 
 			// Apply friction && gravity
-			(velocityX < 2 && velocityX > -2) ? velocityX = 0 : velocityX /= frictionX;
-			(velocityY < 2 && velocityY > -2) ? velocityY = 0 : velocityY /= frictionY;
-
-			float frameTime = float(GetFrameTime());
-			float fps = (1.0f/frameTime);
-			float timeDillate = fps / 60.0f;
-
-			if(!grounded) accelY += 0.1*accel_speed;
-			else          accelY = 2;
-
-
-
-			x += int(velocityX/timeDillate);
-			y += float(velocityY/timeDillate);
-
-			std::cout << velocityX << " - " << x << std::endl;
+			(velocityX < 2.0*dt && velocityX > -2.0*dt) ? velocityX = 0 : velocityX -= (velocityX / frictionX) * dt;
 		}
 		int getX(){
 			return x;
