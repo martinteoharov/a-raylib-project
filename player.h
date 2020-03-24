@@ -8,7 +8,7 @@ class Player {
 		double time             = GetTime();
 		double prevTime         = 0;
 		const int animSpeed     = 10;
-		int prevHeaded          = 1;
+		int headed              = 1;
 		int currFrame           = 0;
 
 		// character velocity
@@ -29,49 +29,33 @@ class Player {
 		// Texture & Animation
 		Texture2D texture;
 
-		void drawRun(int headed, int currFrame){
-			const int frames = 5;
-			const int startPos = 9;
-			int frame = currFrame % frames;
+		void drawState(int currFrame, int state){
+			int frames, startPos, frame;
+			switch(state){
+				case 0: // run
+					frames = 5;
+					startPos = 9;
+					frame = currFrame % frames;
+					break;
+				case 1: // fixed
+					frames = 4;
+					startPos = 0;
+					frame = currFrame % frames;
+					break;
+				case 2: // jump
+					frames = 2;
+					startPos = 14;
+					frame = currFrame % frames;
+					break;
+				case 3: // fall
+					frames = 2;
+					startPos = 16;
+					frame = currFrame % frames;
+					break;
 
+			}
 			DrawTexturePro(texture,
 					Rectangle {(frame+startPos)*widthTex, 0, headed*widthTex, heightTex},
-					Rectangle {x, y, width, height},
-					Vector2   {0, 0},
-					0.0f,
-					RAYWHITE);
-		}
-		void drawFixed(int headed, int currFrame){
-			const int frames = 4;
-			const int startPos = 0;
-			int frame = currFrame % frames;
-
-			DrawTexturePro(texture,
-					Rectangle {(frame+startPos)*widthTex, 0, prevHeaded*widthTex, heightTex},
-					Rectangle {x, y, width, height},
-					Vector2   {0, 0},
-					0.0f,
-					RAYWHITE);
-		}
-		void drawJump(int headed, int currFrame){
-			const int frames = 2;
-			const int startPos = 14;
-			int frame = currFrame % frames;
-
-			DrawTexturePro(texture,
-					Rectangle {(frame+startPos)*widthTex, 0, prevHeaded*widthTex, heightTex},
-					Rectangle {x, y, width, height},
-					Vector2   {0, 0},
-					0.0f,
-					RAYWHITE);
-		}
-		void drawFall(int headed, int currFrame){
-			const int frames = 2;
-			const int startPos = 16;
-			int frame = currFrame % frames;
-
-			DrawTexturePro(texture,
-					Rectangle {(frame+startPos)*widthTex, 0, prevHeaded*widthTex, heightTex},
 					Rectangle {x, y, width, height},
 					Vector2   {0, 0},
 					0.0f,
@@ -88,23 +72,35 @@ class Player {
 			texture   = _player;
 		}
 		void animation(){
+			int state;
 			time = GetTime();
 			if(time > prevTime + (1.0/animSpeed)){
 				prevTime = time;
 				currFrame ++;
 			}
-			int headed = velocityX;
-			if(headed > 0) {headed = 1; prevHeaded = 1;}
-			if(headed < 0) {headed = -1; prevHeaded = -1;}
+
+			int temp_headed = velocityX;
+			if(temp_headed > 0){
+				temp_headed = 1; headed = 1;
+			}
+			if(temp_headed < 0){
+				temp_headed = -1; headed = -1;
+			}
+
 			if(velocityY < -1){
-				drawJump(headed, currFrame);
+				state = 2; // jump
 			}
 			else if(velocityY > 2){
-				drawFall(headed, currFrame);
+				state = 3; // fall
 			}
-			else{
-				headed != 0 ? drawRun(headed, currFrame) : drawFixed(prevHeaded, currFrame);
+			else if(temp_headed != 0){
+				state = 0; // run
 			}
+			else {
+				state = 1; // fall
+			}
+
+			drawState(currFrame, state);
 		}
 
 		void handleKeyPresses(std::vector<Rectangle>& objects){
