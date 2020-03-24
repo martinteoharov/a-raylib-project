@@ -104,14 +104,13 @@ class Player {
 		}
 
 		void handleKeyPresses(std::vector<Rectangle>& objects){
-			float dt = GetFrameTime() * 60;
 			accelX = 0;
 			// KEYPRESS
 			if (IsKeyDown(KEY_D)){
-				accelX = forceX * dt;
+				accelX = forceX;
 			}
 			if (IsKeyDown(KEY_A)){
-				accelX = -forceX * dt;
+				accelX = -forceX;
 			}
 			if (IsKeyPressed(KEY_W) && grounded){
 				velocityY = -forceY;
@@ -131,14 +130,14 @@ class Player {
 			float friction;
 
 			x += int(velocityX);
-			y += int(velocityY);
+			y += float(velocityY*dt); //why the fuck?
 
-			velocityX += accelX;
-			velocityY += accelY;
+			velocityX += accelX * dt;
+			velocityY += accelY * dt;
 
 			// Apply gravity
-			accelY += gravity * dt;
-			if(accelY > gravity * dt) accelY = gravity * dt;
+			accelY += gravity;
+			if(accelY > gravity) accelY = gravity;
 
 			//check if velocity has passed max_velocity in either direction and correct for it
 			velocityX < -max_velocity*dt ? velocityX = -max_velocity*dt : NULL;
