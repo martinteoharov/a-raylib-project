@@ -17,7 +17,6 @@ TODO:
 	Handle objects with a map array for faster collision detection - 
 	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
 
-	Time dilation bug - jumps are messed up
 
 
 
@@ -33,7 +32,6 @@ TODO:
 
 
 
-
 -------------------------------------------------------------------------------------------------------------------
 |                                                    Done                                                         |
 -------------------------------------------------------------------------------------------------------------------
@@ -42,3 +40,4 @@ TODO:
 2020-03-11      Bullet trajectory fix
 2020-03-23	Fix for time dilation - In short make it so FPS doesn't change velocity of objects
 2020-03-23	Player animations - add jump and fall animation
+2020-03-24	Time dilation bug - jumps are messed up

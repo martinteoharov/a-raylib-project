@@ -1,5 +1,5 @@
-#if !defined(MYLIB_SETTINGS_H)
-#define MYLIB_SETTINGS_H 1
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
 const int WIDTH = 1366;
 const int HEIGHT = 768;

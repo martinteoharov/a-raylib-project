@@ -1,14 +1,5 @@
-#include "constants.h"
 #ifndef GAME_H
 #define GAME_H
-
-struct Bullet {
-	float x;
-	float y;
-	float speedX;
-	float speedY;
-};
-
 
 class Game {
 	private:
@@ -36,9 +27,9 @@ class Game {
 				float speedY = (temp_y - player.getY());
 
 				float norm = sqrt(speedX*speedX + speedY*speedY);
-				speedX /= (norm/10.0f);
-				speedY /= (norm/10.0f);
-				std::cout << speedX << " - " << speedY << std::endl;
+
+				speedX /= (norm/1000.0f); //1000.0f here is the speed of the bullet
+				speedY /= (norm/1000.0f);
 
 				Bullet bullet = {player.getX(), player.getY(), speedX, speedY};
 				bullets.push_back(bullet);
@@ -100,8 +91,10 @@ class Game {
 
 			// Handle bullets
 			for( int i = 0; i < bullets.size(); i ++ ){
-				bullets[i].x += bullets[i].speedX;
-				bullets[i].y += bullets[i].speedY;
+				const float dt = GetFrameTime();
+
+				bullets[i].x += bullets[i].speedX * dt;
+				bullets[i].y += bullets[i].speedY * dt;
 				for( int m = 0; m < objects.size(); m ++ ){
 					if( bullets[i].x > objects[m].x                                 &&
 							bullets[i].x < objects[m].x + objects[m].width  &&

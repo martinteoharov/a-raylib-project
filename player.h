@@ -1,7 +1,6 @@
-#include "constants.h"
-
 #ifndef PLAYER_H
 #define PLAYER_H
+#include "settings.h"
 class Player {
 	private:
 		// used in animation
@@ -129,7 +128,7 @@ class Player {
 			float dt = GetFrameTime() * 60;
 			float friction;
 
-			x += int(velocityX);
+			x += float(velocityX);
 			y += float(velocityY*dt); //why the fuck?
 
 			velocityX += accelX * dt;
