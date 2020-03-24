@@ -3,7 +3,11 @@
 
 class Game {
 	private:
+		int state; // 0 - should close, 1 - main menu, 2 - gameplay
 	public:
+		Game(int _state){
+			state = _state;
+		}
 		void handleKeyPresses(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
 
 			player.handleKeyPresses(objects);
@@ -37,6 +41,9 @@ class Game {
 				if(bullets.size() > 100){
 					bullets.erase(bullets.begin(), bullets.begin()+1);
 				}
+			}
+			if(IsKeyDown(KEY_ESCAPE)){
+			       	state = 1;
 			}
 			camera.zoom += GetMouseWheelMove()/10.0f;
 		}
@@ -134,6 +141,12 @@ class Game {
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
 			EndMode2D();
 			EndDrawing();
+		}
+		int getState(){
+			return state;
+		}
+		int setState(int _state){
+			state = _state;
 		}
 };
 #endif

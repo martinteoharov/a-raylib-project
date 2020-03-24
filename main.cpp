@@ -5,11 +5,16 @@
 //trigonometry
 #include <math.h>
 
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
 #include "raylib.h"
+
 #include "utils.h"
+#include "settings.h"
+#include "menu.h"
+#include "bullet.h"
 #include "player.h"
 #include "game.h"
-#include "constants.h"
 
 //TODO: rewrite this to use new spawnRect function
 void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, const int y, int a, int b){
@@ -22,7 +27,6 @@ void genBuildings(std::vector<Rectangle>& objects, int buildings, int spacing, c
 int main() {
 	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
 
-	Game game;
 	Texture2D texture = LoadTexture("./resources/textures/adventurer.png");
 	//            pos X    pos Y         width of texture          height of texture         width                    height                 texture
 	Player player(100,     400,          float( texture.width/21), float(texture.height),    float(texture.width/10), float(texture.height*2), texture);
@@ -38,12 +42,21 @@ int main() {
 
 	Camera2D camera = {{ 0 }, {0, 0}, 0.0f, 0.0f };
 	camera.zoom = 1.0f;
-	SetTargetFPS(60);
+	SetTargetFPS(120);
 
-	while (!WindowShouldClose()){
-		game.handleKeyPresses(camera, player, objects, bullets);
-		game.handlePhysics(camera, player, objects, bullets);
-		game.handleDraw(objects, bullets, camera, player);
+	Game game(1);
+	Menu menu;
+
+	while (game.getState() != 0){
+		if( game.getState() == 2 ){
+			game.handleKeyPresses(camera, player, objects, bullets);
+			game.handlePhysics(camera, player, objects, bullets);
+			game.handleDraw(objects, bullets, camera, player);
+		}
+		else if( game.getState() == 1 ){
+			game.setState(menu.main()); // menu.main() returns the state that has been chosen - if none has been it returns 1
+			menu.handleDraw(camera);
+		}
 	}
 	CloseWindow();
 
