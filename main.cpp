@@ -6,8 +6,7 @@
 #include <math.h>
 #include <fstream> // read / write
 
-#include <filesystem>
-
+#include <filesystem> // read directories
 
 
 #define RAYGUI_IMPLEMENTATION
@@ -45,44 +44,49 @@ int main() {
 		bool showGame = false;
 		if(game.getState() == 1) {
 			std::string menuState = menu.getState();
-			if( menuState == "newgame" ){
-				objects = Map::serializeRead("maps/default.map");
+			
+			// PARENT MAIN
+			if(menuState == "main"){
+				menu.Main();
+			}
+			else if( menuState == "main-newgame" ){
+				objects = Map::serializeRead("maps/static/default.map");
 				game.setState(2);
 			}
-			else if( menuState == "savegame-continue" ){
-				game.setState(2);
-			}
-			else if( menuState == "loadgame-continue" ){
-				game.setState(2);
-			}
-			else if(menuState == "showmain"){
-				menu.showMain();
-			}
-			else if(menuState == "show-ingame-main"){
-				menu.showInGameMain();
-				showGame = true;
-			}
-			else if(menuState == "show-ingame-save-main"){
-				std::string fn = menu.showInGameSaveMain();
-				if(fn != "")
-					Map::serializeWrite(objects, "maps/" + fn);
-			}
-			else if( menuState == "show-loadgame-main" ){
-				std::string fn = menu.showLoadgameMain();
+			else if( menuState == "main-loadgame" ){
+				std::string fn = menu.mainLoadgame();
 				if(fn != "")
 					objects = Map::serializeRead(fn);
 			}
-			else if( menuState == "show-settings-main" ){
-				menu.showSettingsMain();
+			else if( menuState == "main-settings" ){
+				menu.mainSettings();
 			}
-			else if( menuState == "quit" ){
+			else if( menuState == "main-quit" ){
 				game.setState(0);
 	        	}
+
+
+			// PARENT INGAME
+			else if(menuState == "ingame"){
+				menu.InGame();
+				showGame = true;
+			}
+			else if( menuState == "ingame-continue" ){
+				game.setState(2);
+			}
+			else if(menuState == "ingame-save"){
+				std::string fn = menu.InGameSave();
+				if(fn != "")
+					Map::serializeWrite(objects, "maps/" + fn);
+			}
+			else if(menuState == "ingame-quit"){
+				game.setState(0);
+			}
 			menu.handleDraw(camera, showGame, objects, bullets, player);
 		}
 		else if(game.getState() == 2) {
 			if(IsKeyDown(KEY_ESCAPE)){
-				menu.setState("show-ingame-main");
+				menu.setState("ingame");
 				game.setState(1);
 			}
 

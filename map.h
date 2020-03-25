@@ -34,8 +34,12 @@ void Map::serializeWrite(std::vector<Rectangle> objects, std::string fn){
 
 
 void Map::listMaps(std::string path, std::vector<std::string>& stringvec){
-	for (const auto & entry : std::filesystem::directory_iterator(path))
-		stringvec.push_back(entry.path());
+	for (const auto & entry : std::filesystem::directory_iterator(path)){
+		std::string temp = entry.path();
+		if(temp.find(".map") != std::string::npos){
+			stringvec.push_back(entry.path());
+		}
+	}
 }
 
 

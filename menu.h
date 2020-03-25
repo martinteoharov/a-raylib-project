@@ -5,10 +5,10 @@ class Menu {
 	private:
 		char *fn;
 		float value;
-		std::string state = "showmain";
+		std::string state = "main";
 	public:
-		void showMain(){
-			state = "showmain";
+		void Main(){
+			state = "main";
 			
 
 			const int btnWidth = 200;
@@ -20,23 +20,23 @@ class Menu {
 				if(GuiButton({WIDTH/2 - btnWidth/2, HEIGHT/4 + i * marginTop, btnWidth, btnHeight}, titles[i].c_str()) == 1){
 					switch (i){
 						case 0: // new game
-							state = "newgame";
+							state = "main-newgame";
 							break;
 						case 1:
-							state = "show-loadgame-main";
+							state = "main-loadgame";
 							break;
 						case 2:
-							state = "show-settings-main";
+							state = "main-settings";
 							break;
 						case 3: // exit
-							state = "quit";
+							state = "main-quit";
 							break;
 					}
 				}
 			}
 		}
-		void showInGameMain(){
-			state = "show-ingame-main";
+		void InGame(){
+			state = "ingame";
 			
 			const int btnWidth = 200;
 			const int btnHeight = 50;
@@ -47,17 +47,17 @@ class Menu {
 				if(GuiButton({WIDTH/2 - btnWidth/2, HEIGHT/4 + i * marginTop, btnWidth, btnHeight}, titles[i].c_str()) == 1){
 					switch (i){
 						case 0:
-							state = "show-ingame-save-main"; // go back to main
+							state = "ingame-save"; // go to save
 							break;
 						case 1:
-							state = "showmain"; // go back to main
+							state = "main"; // go back to main
 							break;
 					}
 				}
 			}
 		}
-		std::string showInGameSaveMain(){
-			state = "show-ingame-save-main";
+		std::string InGameSave(){
+			state = "ingame-save";
 			
 			const int boxWidth = 500;
 			const int boxHeight = 200;
@@ -66,15 +66,14 @@ class Menu {
 
 			int pressed = GuiTextInputBox({WIDTH/2 - boxWidth/2, HEIGHT/2 - boxHeight/2, boxWidth, boxHeight}, "Save as:", "Example: filename.map", "Save", fn);
 			if(pressed == 1){
-				state = "savegame-continue";
+				state = "ingame-continue";
 				return fn;
 			}
 
 			return "";
 		}
-
-		void showSettingsMain(){
-			state = "show-settings-main";
+		void mainSettings(){
+			state = "main-settings";
 			
 			const int btnWidth = 200;
 			const int btnHeight = 50;
@@ -97,18 +96,18 @@ class Menu {
 					switch (i){
 						case 0:
 							// do data serialization
-							state = "showmain"; // go back to main
+							state = "main"; // go back to main
 							break;
 						case 1:
-							state = "showmain"; // go back to main
+							state = "main"; // go back to main
 							break;
 					}
 				}
 			}
 
 		}
-		std::string showLoadgameMain(){
-			state = "show-loadgame-main";
+		std::string mainLoadgame(){
+			state = "main-loadgame";
 			
 			const int btnWidth = 200;
 			const int btnHeight = 50;
@@ -127,15 +126,8 @@ class Menu {
 
 			for(int i = 0; i < stringvec.size(); i ++ ){
 				if(GuiButton({WIDTH/2 - btnWidth/2, HEIGHT/4 + i * marginTop, btnWidth, btnHeight}, stringvec[i].c_str()) == 1){
-					switch (i){
-						case 0:
-							// do data serialization
-							state = "loadgame-continue"; // go back to main
-							return stringvec[i].c_str();
-						case 1:
-							state = "loadgame-continue"; // go back to main
-							return stringvec[i].c_str();
-					}
+					state = "ingame-continue"; // go back to main
+					return stringvec[i].c_str();
 				}
 			}
 			return "";
@@ -144,20 +136,10 @@ class Menu {
 		void handleDraw(Camera2D& camera, bool showGame, std::vector<Rectangle> &objects, std::vector<Bullet> &bullets, Player& player){
 			
 			BeginDrawing();
-			ClearBackground(RAYWHITE);
+			if(!showGame)
+				ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
 
-			if(showGame){
-				player.animation();
-				for( int i = 0; i < objects.size(); i ++ ){
-					DrawRectangleRec(objects[i], DARKGRAY);
-				}
-				for( int i = 0; i < bullets.size(); i ++ ){
-					DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
-				}
-				std::string sText = "FPS: " + std::to_string(GetFPS()) + "\n" + "velocityX:" + std::to_string(player.getVelX()) + " velocityY:" + std::to_string(player.getVelY()) + '\n' + "accelX:" + std::to_string(player.getAccelX()) + " accelY:" + std::to_string(player.getAccelY());
-
-			}
 
 
 			EndMode2D();
