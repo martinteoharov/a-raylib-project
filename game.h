@@ -4,9 +4,11 @@
 class Game {
 	private:
 		int state; // 0 - should close, 1 - main menu, 2 - gameplay
+		Menu menu;
 	public:
-		Game(int _state){
+		Game(int _state, Menu _menu){
 			state = _state;
+			menu = _menu;
 		}
 		void handleKeyPresses(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
 

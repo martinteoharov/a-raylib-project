@@ -11,9 +11,9 @@
 
 #include "utils.h"
 #include "settings.h"
-#include "menu.h"
 #include "bullet.h"
 #include "player.h"
+#include "menu.h"
 #include "game.h"
 
 //TODO: rewrite this to use new spawnRect function
@@ -42,20 +42,50 @@ int main() {
 
 	Camera2D camera = {{ 0 }, {0, 0}, 0.0f, 0.0f };
 	camera.zoom = 1.0f;
-	SetTargetFPS(120);
+	SetTargetFPS(60);
 
-	Game game(1);
 	Menu menu;
+	Game game(1, menu);
 
-	while (game.getState() != 0){
-		if( game.getState() == 2 ){
+	while (game.getState() != 0){ // untill game should close
+		bool showGame = false;
+		if(game.getState() == 1) {
+			std::string menuState = menu.getState();
+			if( menuState == "newgame" ){
+				game.setState(2);
+			}
+			else if( menuState == "savegame-continue" ){
+				// data serialization
+				game.setState(2);
+			}
+			else if(menuState == "showmain"){
+				menu.showMain();
+			}
+			else if(menuState == "show-ingame-main"){
+				menu.showInGameMain();
+				showGame = true;
+			}
+			else if( menuState == "show-loadgame-main" ){
+				//menu.setState(..);
+			}
+			else if( menuState == "show-settings-main" ){
+				menu.showSettingsMain();
+			}
+			else if( menuState == "quit" ){
+				game.setState(0);
+	        	}
+			menu.handleDraw(camera, showGame, objects, bullets, player);
+		}
+		else if(game.getState() == 2) {
+			if(IsKeyDown(KEY_ESCAPE)){
+				menu.setState("show-ingame-main");
+				game.setState(1);
+			}
+
 			game.handleKeyPresses(camera, player, objects, bullets);
 			game.handlePhysics(camera, player, objects, bullets);
 			game.handleDraw(objects, bullets, camera, player);
-		}
-		else if( game.getState() == 1 ){
-			game.setState(menu.main()); // menu.main() returns the state that has been chosen - if none has been it returns 1
-			menu.handleDraw(camera);
+
 		}
 	}
 	CloseWindow();
