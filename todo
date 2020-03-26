@@ -17,12 +17,6 @@ TODO:
 	Handle objects with a map array for faster collision detection - 
 	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
 
-	Global Settings - FPS, Resolution, Volume, rGuiStyle() , etc... 
-
-	Attach Global Settings to GUI
-	
-	Menu Key Press Sounds
-
 	Ingame Sounds
 
 	New Player models
@@ -33,8 +27,8 @@ TODO:
 |                                                 In Progress                                                     |
 -------------------------------------------------------------------------------------------------------------------
 
-
-	(Minor) Load & Read Player Info from File
+	
+	Menu Key Press Sounds
 
 
 
@@ -54,3 +48,8 @@ TODO:
 
 2020-03-25      GUI
 2020-03-25      READ / WRITE Serialization (map reader)
+
+2020-03-26 	Global Settings - FPS, Resolution, Volume, rGuiStyle() , etc... 
+2020-03-26	Attach Global Settings to GUI
+2020-03-26      READ / WRITE Serialization (map reader)
+2020-03-26	(Minor) Load & Read Player Info from File

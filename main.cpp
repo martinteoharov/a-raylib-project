@@ -14,7 +14,7 @@
 #include "raylib.h"
 
 #include "utils.h"
-#include "settings.h"
+#include "config.h"
 #include "map.h"
 #include "bullet.h"
 #include "player.h"
@@ -23,22 +23,29 @@
 
 
 int main() {
-	InitWindow(WIDTH, HEIGHT, "a-raylib-project");
+	
+	if(config::LOAD_CONFIG("config/default.conf")){
+		std::cout << "CONFIG LOADED SUCCESSFULY" << std::endl;
+	}
+
+	InitWindow(config::SCREEN_WIDTH, config::SCREEN_HEIGHT, "a-raylib-project");
 
 	Texture2D texture = LoadTexture("./resources/textures/adventurer.png");
 	//            pos X    pos Y         width of texture          height of texture         width                    height                 texture
-	Player player(100,     400,          float( texture.width/21), float(texture.height),    float(texture.width/10), float(texture.height*2), texture);
+	Player player(100,     400,          float( texture.width/21), float(texture.height),    config::PLAYER_WIDTH, config::PLAYER_HEIGHT, texture);
 
 
 	Camera2D camera = {{ 0 }, {0, 0}, 0.0f, 0.0f };
 	camera.zoom = 1.0f;
-	SetTargetFPS(60);
+	SetTargetFPS(config::FPS);
 
 	Menu menu;
 	Game game(1, menu);
 
 	std::vector<Rectangle> objects;
 	std::vector<Bullet>    bullets;
+	InitAudioDevice();      // Initialize audio device
+
 
 	while (game.getState() != 0){ // untill game should close
 		bool showGame = false;
@@ -50,13 +57,15 @@ int main() {
 				menu.Main();
 			}
 			else if( menuState == "main-newgame" ){
-				objects = Map::serializeRead("maps/static/default.map");
+				objects = Map::serializeRead("maps/static/default.map", player);
 				game.setState(2);
 			}
 			else if( menuState == "main-loadgame" ){
 				std::string fn = menu.mainLoadgame();
-				if(fn != "")
-					objects = Map::serializeRead(fn);
+				if(fn != ""){
+					objects = Map::serializeRead(fn, player);
+
+				}
 			}
 			else if( menuState == "main-settings" ){
 				menu.mainSettings();
@@ -71,13 +80,17 @@ int main() {
 				menu.InGame();
 				showGame = true;
 			}
+			else if( menuState == "ingame-settings" ){
+				menu.InGameSettings();
+			}
 			else if( menuState == "ingame-continue" ){
 				game.setState(2);
 			}
 			else if(menuState == "ingame-save"){
+				showGame = true;
 				std::string fn = menu.InGameSave();
 				if(fn != "")
-					Map::serializeWrite(objects, "maps/" + fn);
+					Map::serializeWrite(objects, player, "maps/" + fn);
 			}
 			else if(menuState == "ingame-quit"){
 				game.setState(0);
@@ -96,6 +109,7 @@ int main() {
 
 		}
 	}
+	std::cout << "AVERAGE FPS: " << getAverageFPS() << std::endl;
 	CloseWindow();
 
 	return 0;

@@ -1,9 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
+#include "config.h"
 
 class Game {
 	private:
+		int currFrame = 1;
+		int fps;
 		int state; // 0 - should close, 1 - main menu, 2 - gameplay
+		std::string sText;
 		Menu menu;
 	public:
 		Game(int _state, Menu _menu){
@@ -118,8 +122,8 @@ class Game {
 				}
 			}
 
-			camera.offset.x = (-player.getX() - GetMouseX()/5 + WIDTH/3/camera.zoom)*camera.zoom;
-			camera.offset.y = (-player.getY() - GetMouseY()/5 + HEIGHT/2/camera.zoom)*camera.zoom;
+			camera.offset.x = (-player.getX() - GetMouseX()/5 + config::SCREEN_WIDTH/3/camera.zoom)*camera.zoom;
+			camera.offset.y = (-player.getY() - GetMouseY()/5 + config::SCREEN_HEIGHT/2/camera.zoom)*camera.zoom;
 		}
 
 		void handleDraw(std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
@@ -127,6 +131,7 @@ class Game {
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
 			player.animation();
+			getAverageFPS();
 
 			for( int i = 0; i < objects.size(); i ++ ){
 				DrawRectangleRec(objects[i], DARKGRAY);
@@ -134,15 +139,26 @@ class Game {
 			for( int i = 0; i < bullets.size(); i ++ ){
 				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
 			}
-			std::string sText = "FPS: " + std::to_string(GetFPS()) + "\n" + "velocityX:" + std::to_string(player.getVelX()) + " velocityY:" + std::to_string(player.getVelY()) + '\n' + "accelX:" + std::to_string(player.getAccelX()) + " accelY:" + std::to_string(player.getAccelY());
+
+
+			DrawFPS(-camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 10);
+			if(GetFrameTime() * currFrame > 0.1){
+				sText = "velocityX:" + std::to_string(player.getVelX()) + " velocityY:" + std::to_string(player.getVelY()) + '\n' + "accelX:" + std::to_string(player.getAccelX()) + " accelY:" + std::to_string(player.getAccelY());
+				currFrame = 0;
+			}
 			const char *cText = sText.c_str();
-			DrawText(cText, -camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 10, 20, GREEN);
+			DrawText(cText, -camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 30, 20, DARKGREEN);
+
+			currFrame ++;
 
 
 
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
 			EndMode2D();
 			EndDrawing();
+		}
+		void Init(){
+
 		}
 		int getState(){
 			return state;

@@ -1,6 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "settings.h"
+#include "config.h"
 class Player {
 	private:
 		// used in animation
@@ -42,13 +42,13 @@ class Player {
 					frame = currFrame % frames;
 					break;
 				case 2: // jump
-					frames = 2;
-					startPos = 14;
+					frames = 3;
+					startPos = 15;
 					frame = currFrame % frames;
 					break;
 				case 3: // fall
-					frames = 2;
-					startPos = 16;
+					frames = 3;
+					startPos = 17;
 					frame = currFrame % frames;
 					break;
 
@@ -116,8 +116,8 @@ class Player {
 				grounded = false;
 			}
 			if (IsKeyDown(KEY_R)){
-				x = WIDTH/2;
-				y = HEIGHT/3;
+				x = config::SCREEN_WIDTH/2;
+				y = config::SCREEN_HEIGHT/3;
 				// Erase pasted objects
 				for( int i = 0; i < objects.size(); i ++ ){
 					objects.erase(objects.begin() + 1 + 100, objects.begin() + objects.size());
@@ -184,7 +184,6 @@ class Player {
 		void setGrounded(bool _grounded){
 			grounded = _grounded;
 		}
-
 };
 
 
