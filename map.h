@@ -15,6 +15,21 @@ class Map {
 		static void listMaps(std::string path, std::vector<std::string>& stringvec);
 		static void drawSectors(int norm_x);
 };
+bool findRectInVec(Rectangle rect, std::vector<Rectangle> vec){
+	for(int i = 0; i < vec.size(); i ++ ){
+		if(vec[i].x == rect.x &&
+			       	vec[i].width == rect.width &&
+			       	vec[i].y == rect.y &&
+			       	vec[i].height == rect.height) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
 void Map::createRect (Rectangle obj, std::map<int, std::vector<Rectangle>>& mObjects){
 	int normX = obj.x / GRID_SIZE;
 	int normBigX = (obj.x + obj.width) / GRID_SIZE;
@@ -61,7 +76,8 @@ std::map<int, std::vector<Rectangle>> Map::serializeRead(std::string fn, Player&
 void Map::serializeWrite(std::map<int, std::vector<Rectangle>> mObjects, Player& player, std::string fn){
 	std::cout << "SAVING.. " << fn << std::endl;
 	std::ofstream outfile;
-	outfile.open (fn);
+
+	outfile.open (fn, std::ofstream::out | std::ofstream::trunc);
 
 	//std::vector<Rectangle> objects = mObjects[player.getX() / GRID_SIZE];
 	std::vector<Rectangle> objects;
@@ -70,7 +86,8 @@ void Map::serializeWrite(std::map<int, std::vector<Rectangle>> mObjects, Player&
 	for (const auto& elem : mObjects) {
 		std::vector<Rectangle> vec = elem.second;
 		for(int i = 0; i < vec.size(); i ++ ){
-			objects.push_back(vec[i]);
+			if(!findRectInVec(vec[i], objects))
+				objects.push_back(vec[i]);
 		}
 	}
 
