@@ -20,7 +20,6 @@ class Game {
 
 			// Spawn rect object
 			if(IsMouseButtonDown(0)){
-				std::cout << "New element" << std::endl;
 				int temp_x = -camera.offset.x/camera.zoom + GetMouseX()/camera.zoom;
 				int temp_y = -camera.offset.y/camera.zoom + GetMouseY()/camera.zoom;
 
@@ -179,6 +178,7 @@ class Game {
 
 			currFrame ++;
 
+			//Map::drawSectors(norm_x);
 
 
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);

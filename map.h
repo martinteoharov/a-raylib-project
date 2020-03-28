@@ -13,6 +13,7 @@ class Map {
 		static std::map<int, std::vector<Rectangle>> serializeRead (std::string fn, Player& player);
 		static void serializeWrite(std::map<int, std::vector<Rectangle>> mObjects, Player& player, std::string fn);
 		static void listMaps(std::string path, std::vector<std::string>& stringvec);
+		static void drawSectors(int norm_x);
 };
 void Map::createRect (Rectangle obj, std::map<int, std::vector<Rectangle>>& mObjects){
 	int normX = obj.x / GRID_SIZE;
@@ -91,6 +92,24 @@ void Map::listMaps(std::string path, std::vector<std::string>& stringvec){
 		}
 	}
 }
+void Map::drawSectors(int norm_x){
+	for(int i = 0; i < 100; i ++ ){
+		Rectangle line;
+		line.x = i * GRID_SIZE;
+		line.y = -1000;
+		line.width = 5;
+		line.height = 2000;
+
+		if(norm_x == i || norm_x == i - 1){
+			//active
+			DrawRectangleRec(line, DARKGREEN);
+		}else{
+			DrawRectangleRec(line, GREEN);
+		}
+
+	}
+}
+
 
 
 #endif
