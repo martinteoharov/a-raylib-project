@@ -54,3 +54,4 @@ TODO:
 2020-03-26	(Minor) Load & Read Player Info from File
 
 2020-03-27 	Chunk system - optimized collision detection and draw
+2020-03-27 	Render distance

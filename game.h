@@ -152,15 +152,17 @@ class Game {
 
 			int norm_x = player.getX() / GRID_SIZE;
 
-			//draw 2 chunks
-			std::vector<Rectangle> objects  = mObjects[norm_x];
-			std::vector<Rectangle> objects2 = mObjects[norm_x + 1];
+			std::vector<Rectangle> vObjects;
+			for(int i = -RENDER_DISTANCE; i < RENDER_DISTANCE; i ++ ){
+				for(int m = 0; m < mObjects[norm_x + i].size(); m ++ ){
+					vObjects.push_back(mObjects[norm_x+i][m]);
+				}
+			}
 
-			objects.insert( objects.end(), objects2.begin(), objects2.end() );
 
 
-			for( int i = 0; i < objects.size(); i ++ ){
-				DrawRectangleRec(objects[i], DARKGRAY);
+			for( int i = 0; i < vObjects.size(); i ++ ){
+				DrawRectangleRec(vObjects[i], DARKGRAY);
 			}
 			for( int i = 0; i < bullets.size(); i ++ ){
 				DrawRectangle(bullets[i].x, bullets[i].y, 10, 10, DARKGRAY);
