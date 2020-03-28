@@ -2,12 +2,13 @@
 #include <iostream>
 //vector
 #include <vector>
+#include <map>
+//#include <list>
 //trigonometry
 #include <math.h>
 #include <fstream> // read / write
 
 #include <filesystem> // read directories
-
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -42,11 +43,16 @@ int main() {
 	Menu menu;
 	Game game(1, menu);
 
-	std::vector<Rectangle> objects;
 	std::vector<Bullet>    bullets;
 	InitAudioDevice();      // Initialize audio device
 
+	TraceLog(0, "LOG_INFO");    // Enable INFO and WARNING log output messages
 
+	std::map<int, std::vector<Rectangle>> mObjects;
+
+
+	//game.getState() 0 - game should close, 1 - menu, 2 - gameplay
+	
 	while (game.getState() != 0){ // untill game should close
 		bool showGame = false;
 		if(game.getState() == 1) {
@@ -57,13 +63,13 @@ int main() {
 				menu.Main();
 			}
 			else if( menuState == "main-newgame" ){
-				objects = Map::serializeRead("maps/static/default.map", player);
+				mObjects = Map::serializeRead("maps/static/default.map", player);
 				game.setState(2);
 			}
 			else if( menuState == "main-loadgame" ){
 				std::string fn = menu.mainLoadgame();
 				if(fn != ""){
-					objects = Map::serializeRead(fn, player);
+					mObjects = Map::serializeRead(fn, player);
 
 				}
 			}
@@ -90,12 +96,12 @@ int main() {
 				showGame = true;
 				std::string fn = menu.InGameSave();
 				if(fn != "")
-					Map::serializeWrite(objects, player, "maps/" + fn);
+					Map::serializeWrite(mObjects, player, "maps/" + fn);
 			}
 			else if(menuState == "ingame-quit"){
 				game.setState(0);
 			}
-			menu.handleDraw(camera, showGame, objects, bullets, player);
+			menu.handleDraw(camera, showGame, mObjects, bullets, player);
 		}
 		else if(game.getState() == 2) {
 			if(IsKeyDown(KEY_ESCAPE)){
@@ -103,9 +109,10 @@ int main() {
 				game.setState(1);
 			}
 
-			game.handleKeyPresses(camera, player, objects, bullets);
-			game.handlePhysics(camera, player, objects, bullets);
-			game.handleDraw(objects, bullets, camera, player);
+			game.handleKeyPresses(camera, player, mObjects, bullets);
+			game.handleMovement(camera, player, mObjects, bullets);
+			game.handleCollision(camera, player, mObjects, bullets);
+			game.handleDraw(mObjects, bullets, camera, player);
 
 		}
 	}

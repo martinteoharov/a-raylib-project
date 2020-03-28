@@ -14,7 +14,6 @@ TODO:
 
 	Tweak player controls https://www.youtube.com/watch?v=yorTG9at90g&t=8s
 
-	Handle objects with a map array for faster collision detection - 
 	https://gamedev.stackexchange.com/questions/74858/how-can-i-improve-my-collision-detections-performance
 
 	Ingame Sounds
@@ -53,3 +52,5 @@ TODO:
 2020-03-26	Attach Global Settings to GUI
 2020-03-26      READ / WRITE Serialization (map reader)
 2020-03-26	(Minor) Load & Read Player Info from File
+
+2020-03-27 	Chunk system - optimized collision detection and draw

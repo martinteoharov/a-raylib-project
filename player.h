@@ -42,13 +42,13 @@ class Player {
 					frame = currFrame % frames;
 					break;
 				case 2: // jump
-					frames = 3;
+					frames = 2;
 					startPos = 15;
 					frame = currFrame % frames;
 					break;
 				case 3: // fall
-					frames = 3;
-					startPos = 17;
+					frames = 2;
+					startPos = 18;
 					frame = currFrame % frames;
 					break;
 
@@ -102,7 +102,7 @@ class Player {
 			drawState(currFrame, state);
 		}
 
-		void handleKeyPresses(std::vector<Rectangle>& objects){
+		void handleKeyPresses(){
 			accelX = 0;
 			// KEYPRESS
 			if (IsKeyDown(KEY_D)){
@@ -118,13 +118,9 @@ class Player {
 			if (IsKeyDown(KEY_R)){
 				x = config::SCREEN_WIDTH/2;
 				y = config::SCREEN_HEIGHT/3;
-				// Erase pasted objects
-				for( int i = 0; i < objects.size(); i ++ ){
-					objects.erase(objects.begin() + 1 + 100, objects.begin() + objects.size());
-				}
 			}
 		}
-		void handlePhysics(){
+		void handleMovement(){
 			float dt = GetFrameTime() * 60;
 			float friction;
 
@@ -174,6 +170,12 @@ class Player {
 		}
 		void setVelY(int vel){
 			velocityY = vel;
+		}
+		void setAccelX(int acc){
+			accelX = acc;
+		}
+		void setAccelY(int acc){
+			accelY = acc;
 		}
 		void setX(int _x){
 			x = _x;

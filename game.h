@@ -14,17 +14,20 @@ class Game {
 			state = _state;
 			menu = _menu;
 		}
-		void handleKeyPresses(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
+		void handleKeyPresses(Camera2D& camera, Player& player, std::map<int, std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets){
 
-			player.handleKeyPresses(objects);
+			player.handleKeyPresses();
 
 			// Spawn rect object
 			if(IsMouseButtonDown(0)){
+				std::cout << "New element" << std::endl;
 				int temp_x = -camera.offset.x/camera.zoom + GetMouseX()/camera.zoom;
 				int temp_y = -camera.offset.y/camera.zoom + GetMouseY()/camera.zoom;
 
+				int norm_x = temp_x / GRID_SIZE;
+
 				Rectangle temp = { temp_x, temp_y, 50, 50 };
-				objects.push_back(temp);
+				Map::createRect(temp, mObjects);
 			}
 
 			// Spawn bullet object
@@ -44,6 +47,10 @@ class Game {
 				Bullet bullet = {player.getX(), player.getY(), speedX, speedY};
 				bullets.push_back(bullet);
 
+				//Push Back
+				//player.setVelX(-speedX);
+				//player.setVelY(-speedY);
+
 				if(bullets.size() > 100){
 					bullets.erase(bullets.begin(), bullets.begin()+1);
 				}
@@ -54,12 +61,45 @@ class Game {
 			camera.zoom += GetMouseWheelMove()/10.0f;
 		}
 
-		void handlePhysics(Camera2D& camera, Player& player, std::vector<Rectangle>& objects, std::vector<Bullet>& bullets){
+		void handleMovement(Camera2D& camera, Player& player, std::map<int, std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets){
 			// PHYSICS
 			// Handle player movement
-			player.handlePhysics();
+			player.handleMovement();
+			
+			// Handle bullets
+			for( int i = 0; i < bullets.size(); i ++ ){
+				const float dt = GetFrameTime();
 
+				bullets[i].x += bullets[i].speedX * dt;
+				bullets[i].y += bullets[i].speedY * dt;
+
+				int norm_x = bullets[i].x / GRID_SIZE;
+
+				std::vector<Rectangle> objects = mObjects[norm_x];
+
+				for( int m = 0; m < objects.size(); m ++ ){
+					if( bullets[i].x > objects[m].x                                 &&
+							bullets[i].x < objects[m].x + objects[m].width  &&
+							bullets[i].y > objects[m].y                     &&
+							bullets[i].y < objects[m].y + objects[m].height ){
+
+						bullets.erase(bullets.begin() + i);
+						objects.erase(objects.begin() + m);
+						mObjects[norm_x] = objects;
+						i--;
+						m--;
+					}
+				}
+			}
+
+			camera.offset.x = (-player.getX() - GetMouseX()/5 + config::SCREEN_WIDTH/3/camera.zoom)*camera.zoom;
+			camera.offset.y = (-player.getY() - GetMouseY()/5 + config::SCREEN_HEIGHT/2/camera.zoom)*camera.zoom;
+		}
+		void handleCollision(Camera2D& camera, Player& player, std::map<int, std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets){
 			// Handle collision
+			int normX = (player.getX() + player.getW()) / GRID_SIZE;
+			std::vector<Rectangle> objects = mObjects[normX];
+
 			for( int i = 0; i < objects.size(); i ++ ){
 				if( player.getX() > objects[i].x - player.getW()                 &&
 						player.getX() < objects[i].x + objects[i].width  &&
@@ -101,37 +141,23 @@ class Game {
 					}
 				}
 			}
-
-			// Handle bullets
-			for( int i = 0; i < bullets.size(); i ++ ){
-				const float dt = GetFrameTime();
-
-				bullets[i].x += bullets[i].speedX * dt;
-				bullets[i].y += bullets[i].speedY * dt;
-				for( int m = 0; m < objects.size(); m ++ ){
-					if( bullets[i].x > objects[m].x                                 &&
-							bullets[i].x < objects[m].x + objects[m].width  &&
-							bullets[i].y > objects[m].y                     &&
-							bullets[i].y < objects[m].y + objects[m].height ){
-
-						bullets.erase(bullets.begin() + i);
-						objects.erase(objects.begin() + m);
-						i--;
-						m--;
-					}
-				}
-			}
-
-			camera.offset.x = (-player.getX() - GetMouseX()/5 + config::SCREEN_WIDTH/3/camera.zoom)*camera.zoom;
-			camera.offset.y = (-player.getY() - GetMouseY()/5 + config::SCREEN_HEIGHT/2/camera.zoom)*camera.zoom;
 		}
 
-		void handleDraw(std::vector<Rectangle>& objects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
+		void handleDraw(std::map<int,std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
 			BeginDrawing();
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
 			player.animation();
 			getAverageFPS();
+
+			int norm_x = player.getX() / GRID_SIZE;
+
+			//draw 2 chunks
+			std::vector<Rectangle> objects  = mObjects[norm_x];
+			std::vector<Rectangle> objects2 = mObjects[norm_x + 1];
+
+			objects.insert( objects.end(), objects2.begin(), objects2.end() );
+
 
 			for( int i = 0; i < objects.size(); i ++ ){
 				DrawRectangleRec(objects[i], DARKGRAY);

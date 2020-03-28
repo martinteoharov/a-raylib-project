@@ -6,7 +6,6 @@ class Menu {
 	private:
 		char fn[200] = "";
 		float value = config::FPS;
-
 		std::string state = "main";
 	public:
 		void Main(){
@@ -111,6 +110,7 @@ class Menu {
 							state = "ingame-continue"; // go back to main
 							break;
 						case 1:
+							value = config::FPS;
 							state = "ingame-continue"; // go back to main
 							break;
 					}
@@ -180,7 +180,7 @@ class Menu {
 			return "";
 		}
 
-		void handleDraw(Camera2D& camera, bool showGame, std::vector<Rectangle> &objects, std::vector<Bullet> &bullets, Player& player){
+		void handleDraw(Camera2D& camera, bool showGame, std::map<int, std::vector<Rectangle>> &mObjects, std::vector<Bullet> &bullets, Player& player){
 			
 			BeginDrawing();
 			if(!showGame)

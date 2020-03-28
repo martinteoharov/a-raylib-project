@@ -25,7 +25,8 @@ bool config::LOAD_CONFIG(std::string fn){
                         config::FPS = val;
                 else if(name == "PLAYER_WIDTH")
                         config::PLAYER_WIDTH = val;
-
+                else if(name == "PLAYER_HEIGHT")
+                        config::PLAYER_HEIGHT = val;
                 else if(name == "SCREEN_WIDTH")
                         config::SCREEN_WIDTH = val;
                 else if(name == "SCREEN_HEIGHT")
