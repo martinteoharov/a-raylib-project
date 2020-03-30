@@ -90,10 +90,9 @@ class Game {
 					}
 				}
 			}
-
-			camera.offset.x = (-player.getX() - GetMouseX()/5 + config::SCREEN_WIDTH/3/camera.zoom)*camera.zoom;
-			camera.offset.y = (-player.getY() - GetMouseY()/5 + config::SCREEN_HEIGHT/2/camera.zoom)*camera.zoom;
 		}
+
+
 		void handleCollision(Camera2D& camera, Player& player, std::map<int, std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets){
 			// Handle collision
 			int normX = (player.getX() + player.getW()) / GRID_SIZE;
@@ -140,6 +139,10 @@ class Game {
 					}
 				}
 			}
+
+			//This Should be Right After Collision Detection Otherwise The Delay Is Enough To Cause A Shakey Screen
+			camera.offset.x = (-player.getX() - GetMouseX()/5 + config::SCREEN_WIDTH/3/camera.zoom)*camera.zoom;
+			camera.offset.y = (-player.getY() - GetMouseY()/5 + config::SCREEN_HEIGHT/2/camera.zoom)*camera.zoom;
 		}
 
 		void handleDraw(std::map<int,std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){

@@ -2,7 +2,7 @@
 #define MAP_H
 #include "player.h"
 
-#define GRID_SIZE 2000
+#define GRID_SIZE 1500
 #define RENDER_DISTANCE 2
 
 
@@ -10,10 +10,13 @@ class Map {
 	private:
 	public:
 		static void createRect (Rectangle obj, std::map<int, std::vector<Rectangle>>& mObjects);
+
 		static std::map<int, std::vector<Rectangle>> serializeRead (std::string fn, Player& player);
 		static void serializeWrite(std::map<int, std::vector<Rectangle>> mObjects, Player& player, std::string fn);
+
 		static void listMaps(std::string path, std::vector<std::string>& stringvec);
 		static void drawSectors(int norm_x);
+
 };
 bool findRectInVec(Rectangle rect, std::vector<Rectangle> vec){
 	for(int i = 0; i < vec.size(); i ++ ){
@@ -126,7 +129,5 @@ void Map::drawSectors(int norm_x){
 
 	}
 }
-
-
 
 #endif
