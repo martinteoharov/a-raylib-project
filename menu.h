@@ -7,16 +7,18 @@ class Menu {
 		char fn[200] = "";
 		float value = config::FPS;
 		std::string state = "main";
+
+		//used in mainSettings
+		int active = 0;
+		int oldActive;
 	public:
 		void Main(){
 			state = "main";
 
-
-
 			const int btnWidth = 200;
 			const int btnHeight = 50;
 			const int marginTop = btnHeight + 10;
-			std::string titles [] = {"New Game", "Load Game", "Settings", "Quit"};
+			std::string titles [] = {"New Game", "Create Map", "Settings", "Quit"};
 
 			for(int i = 0; i < sizeof(titles)/sizeof(std::string); i ++ ){
 				if(GuiButton({config::SCREEN_WIDTH/2 - btnWidth/2, config::SCREEN_HEIGHT/4 + i * marginTop, btnWidth, btnHeight}, titles[i].c_str()) == 1){
@@ -25,7 +27,7 @@ class Menu {
 							state = "main-newgame";
 							break;
 						case 1:
-							state = "main-loadgame";
+							state = "main-createmap";
 							break;
 						case 2:
 							state = "main-settings";
@@ -87,20 +89,29 @@ class Menu {
 			
 			const int btnWidth = 200;
 			const int btnHeight = 50;
-			
 			const int sliderWidth = 200;
 			const int sliderHeight = 20;
-
-
+			const int comboBoxHeight = 50;
+			const int comboBoxWidth  = 200;
 			const int marginTop = btnHeight + 10;
+
+			char fps_buf[64];
+			int ret = snprintf(fps_buf, sizeof fps_buf, "%f", value);
+
+			value = GuiSlider({config::SCREEN_WIDTH/2 - sliderWidth/2, 150, sliderWidth, sliderHeight}, "FPS Target", fps_buf, value, 0, 1000);
+
+
+			const char *pixelFormatTextList[2] = { "CHERRY.RGS", "CANDY.RGS" };
+			active = GuiComboBox({config::SCREEN_WIDTH/2 - comboBoxWidth/2, 50, comboBoxWidth, comboBoxHeight}, TextJoin(pixelFormatTextList, 2, ";"), active);
+			if(active != oldActive){
+				std::cout << pixelFormatTextList[active] << std::endl;
+				std::string str(pixelFormatTextList[active], strnlen(pixelFormatTextList[active], 100));
+				GuiLoadStyle(("styles/" + str).c_str());
+			}
+			oldActive = active;
+
 			std::string titles [] = {"Save", "Resume"};
 
-
-			char buffer[64];
-			int ret = snprintf(buffer, sizeof buffer, "%f", value);
-
-
-			value = GuiSlider({config::SCREEN_WIDTH/2 - sliderWidth/2, 100, sliderWidth, sliderHeight}, "FPS Target", buffer, value, 0, 1000);
 			for(int i = 0; i < sizeof(titles)/sizeof(std::string); i ++ ){
 				if(GuiButton({config::SCREEN_WIDTH/2 - btnWidth/2, config::SCREEN_HEIGHT/4 + i * marginTop, btnWidth, btnHeight}, titles[i].c_str()) == 1){
 					switch (i){
@@ -121,22 +132,33 @@ class Menu {
 		void mainSettings(){
 			state = "main-settings";
 			
-			const int btnWidth = 200;
-			const int btnHeight = 50;
-			
-			const int sliderWidth = 200;
-			const int sliderHeight = 20;
-
-
+			const int btnWidth       = 200;
+			const int btnHeight      = 50;
+			const int sliderWidth    = 200;
+			const int sliderHeight   = 20;
+			const int comboBoxHeight = 50;
+			const int comboBoxWidth  = 200;
 			const int marginTop = btnHeight + 10;
+
 			std::string titles [] = {"Save", "Back"};
 
 
-			char buffer[64];
-			int ret = snprintf(buffer, sizeof buffer, "%f", value);
+			char fps_buf[64];
+			int ret = snprintf(fps_buf, sizeof fps_buf, "%f", value);
+
+			value = GuiSlider({config::SCREEN_WIDTH/2 - sliderWidth/2, 150, sliderWidth, sliderHeight}, "FPS Target", fps_buf, value, 0, 1000);
 
 
-			value = GuiSlider({config::SCREEN_WIDTH/2 - sliderWidth/2, 100, sliderWidth, sliderHeight}, "FPS Target", buffer, value, 0, 1000);
+			const char *pixelFormatTextList[2] = { "CHERRY.RGS", "CANDY.RGS" };
+			active = GuiComboBox({config::SCREEN_WIDTH/2 - comboBoxWidth/2, 50, comboBoxWidth, comboBoxHeight}, TextJoin(pixelFormatTextList, 2, ";"), active);
+			if(active != oldActive){
+				std::cout << pixelFormatTextList[active] << std::endl;
+				std::string str(pixelFormatTextList[active], strnlen(pixelFormatTextList[active], 100));
+				GuiLoadStyle(("styles/" + str).c_str());
+			}
+			oldActive = active;
+
+
 			for(int i = 0; i < sizeof(titles)/sizeof(std::string); i ++ ){
 				if(GuiButton({config::SCREEN_WIDTH/2 - btnWidth/2, config::SCREEN_HEIGHT/4 + i * marginTop, btnWidth, btnHeight}, titles[i].c_str()) == 1){
 					switch (i){
@@ -153,8 +175,8 @@ class Menu {
 			}
 
 		}
-		std::string mainLoadgame(){
-			state = "main-loadgame";
+		std::string mainNewgame(){
+			state = "main-newgame";
 			
 			const int btnWidth = 200;
 			const int btnHeight = 50;

@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "config.h"
 
 namespace config {
@@ -9,6 +10,7 @@ namespace config {
 	int PLAYER_HEIGHT = 40;
 	int SCREEN_WIDTH = 1366;
 	int SCREEN_HEIGHT = 768;
+	std::string TEXT_STYLE = "CANDY.RGS";
 	int SHADER = 0;
 }
 
@@ -16,6 +18,10 @@ namespace config {
 bool config::LOAD_CONFIG(std::string fn){
         std::cout << "LOADING CONFIGURATION FILE.." << fn << std::endl;
         std::ifstream infile(fn);
+
+	std::map<int, std::string> mTextStyle;
+	mTextStyle[0] = "CHERRY.RGS";
+	mTextStyle[1] = "CANDY.RGS";
 
         std::string name;
         int val;
@@ -31,6 +37,8 @@ bool config::LOAD_CONFIG(std::string fn){
                         config::SCREEN_WIDTH = val;
                 else if(name == "SCREEN_HEIGHT")
                         config::SCREEN_HEIGHT = val;
+                else if(name == "TEXT_STYLE")
+                        config::TEXT_STYLE = mTextStyle[val];
                 else if(name == "SHADER")
                         config::SHADER = val;
         }

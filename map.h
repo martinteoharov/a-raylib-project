@@ -3,7 +3,7 @@
 #include "player.h"
 
 #define GRID_SIZE 1500
-#define RENDER_DISTANCE 2
+#define RENDER_DISTANCE 1
 
 
 class Map {

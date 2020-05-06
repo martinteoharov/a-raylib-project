@@ -19,7 +19,7 @@ class Game {
 			player.handleKeyPresses();
 
 			// Spawn rect object
-			if(IsMouseButtonDown(0)){
+			if(IsMouseButtonDown(1)){
 				int temp_x = -camera.offset.x/camera.zoom + GetMouseX()/camera.zoom;
 				int temp_y = -camera.offset.y/camera.zoom + GetMouseY()/camera.zoom;
 
@@ -31,7 +31,7 @@ class Game {
 
 			// Spawn bullet object
 			// TODO: Fix trajectory
-			if(IsMouseButtonPressed(1)){
+			if(IsMouseButtonPressed(0)){
 				float temp_x = GetMouseX()/camera.zoom - camera.offset.x/camera.zoom;
 				float temp_y = GetMouseY()/camera.zoom - camera.offset.y/camera.zoom;
 
@@ -95,21 +95,28 @@ class Game {
 
 		void handleCollision(Camera2D& camera, Player& player, std::map<int, std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets){
 			// Handle collision
-			int normX = (player.getX() + player.getW()) / GRID_SIZE;
-			std::vector<Rectangle> objects = mObjects[normX];
+			int norm_x = (player.getX() + player.getW()) / GRID_SIZE;
 
-			for( int i = 0; i < objects.size(); i ++ ){
-				if( player.getX() > objects[i].x - player.getW()                 &&
-						player.getX() < objects[i].x + objects[i].width  &&
-						player.getY() > objects[i].y - player.getH()     &&
-						player.getY() < objects[i].y + objects[i].height ){
+			std::vector<Rectangle> vObjects = mObjects[norm_x];
+
+			for(int i = -RENDER_DISTANCE; i <= RENDER_DISTANCE; i ++ ){
+				for(int m = 0; m < mObjects[norm_x + i].size(); m ++ ){
+					vObjects.push_back(mObjects[norm_x+i][m]);
+				}
+			}
+
+			for( int i = 0; i < vObjects.size(); i ++ ){
+				if( player.getX() > vObjects[i].x - player.getW()                  &&
+						player.getX() < vObjects[i].x + vObjects[i].width  &&
+						player.getY() > vObjects[i].y - player.getH()      &&
+						player.getY() < vObjects[i].y + vObjects[i].height ){
 
 					int side[4];
-					side[0] = player.getY() + player.getH() - objects[i].y;
-					side[1] = player.getY() - objects[i].y - objects[i].height;
+					side[0] = player.getY() + player.getH() - vObjects[i].y;
+					side[1] = player.getY() - vObjects[i].y - vObjects[i].height;
 
-					side[2] = player.getX() - objects[i].x + player.getW();
-					side[3] = player.getX() - objects[i].x - objects[i].width;
+					side[2] = player.getX() - vObjects[i].x + player.getW();
+					side[3] = player.getX() - vObjects[i].x - vObjects[i].width;
 
 					int s = 10000;
 					int ind;
@@ -119,21 +126,21 @@ class Game {
 					}
 					switch (ind){
 						case 0:
-							player.setY(objects[i].y - player.getH());
+							player.setY(vObjects[i].y - player.getH());
 							player.setGrounded(true);
 							player.setVelY(0);
 							break;
 						case 1:
-							player.setY(objects[i].y + objects[i].height);
+							player.setY(vObjects[i].y + vObjects[i].height);
 							player.setGrounded(true);
 							player.setVelY(0);
 							break;
 						case 2:
-							player.setX(objects[i].x - player.getW());
+							player.setX(vObjects[i].x - player.getW());
 							player.setVelX(0);
 							break;
 						case 3:
-							player.setX(objects[i].x + objects[i].width);
+							player.setX(vObjects[i].x + vObjects[i].width);
 							player.setVelX(0);
 							break;
 					}
@@ -152,10 +159,11 @@ class Game {
 			player.animation();
 			getAverageFPS();
 
+			// screen to render
 			int norm_x = player.getX() / GRID_SIZE;
 
 			std::vector<Rectangle> vObjects;
-			for(int i = -RENDER_DISTANCE; i < RENDER_DISTANCE; i ++ ){
+			for(int i = -RENDER_DISTANCE; i <= RENDER_DISTANCE; i ++ ){
 				for(int m = 0; m < mObjects[norm_x + i].size(); m ++ ){
 					vObjects.push_back(mObjects[norm_x+i][m]);
 				}
@@ -173,7 +181,7 @@ class Game {
 
 			DrawFPS(-camera.offset.x/camera.zoom + 10, -camera.offset.y/camera.zoom + 10);
 			if(GetFrameTime() * currFrame > 0.1){
-				sText = "velocityX:" + std::to_string(player.getVelX()) + " velocityY:" + std::to_string(player.getVelY()) + '\n' + "accelX:" + std::to_string(player.getAccelX()) + " accelY:" + std::to_string(player.getAccelY());
+				sText = "velocityX:" + std::to_string(player.getVelX()) + " velocityY:" + std::to_string(player.getVelY()) + '\n' + "accelX:" + std::to_string(player.getAccelX()) + " accelY:" + std::to_string(player.getAccelY()) + '\n' + "x:" + std::to_string(player.getX()) + " y:" + std::to_string(player.getY());
 				currFrame = 0;
 			}
 			const char *cText = sText.c_str();

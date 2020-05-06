@@ -7,6 +7,7 @@ namespace config {
 	extern int PLAYER_HEIGHT;
 	extern int SCREEN_WIDTH;
 	extern int SCREEN_HEIGHT;
+	extern std::string TEXT_STYLE;
 	extern int SHADER;
 
 	bool LOAD_CONFIG(std::string fn);
