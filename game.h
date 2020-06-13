@@ -2,11 +2,12 @@
 #define GAME_H
 #include "config.h"
 
+
 class Game {
 	private:
 		int currFrame = 1;
 		int fps;
-		int state; // 0 - should close, 1 - main menu, 2 - gameplay
+		int state; // 0 - should close, 1 - main menu, 2 - gameplay, 3 - map creator
 		std::string sText;
 		Menu menu;
 	public:
@@ -46,6 +47,8 @@ class Game {
 				Bullet bullet = {player.getX(), player.getY(), speedX, speedY};
 				bullets.push_back(bullet);
 
+				PlaySound(sound::def_shoot_fast);
+
 				//Push Back
 				//player.setVelX(-speedX);
 				//player.setVelY(-speedY);
@@ -84,6 +87,7 @@ class Game {
 
 						bullets.erase(bullets.begin() + i);
 						objects.erase(objects.begin() + m);
+						PlaySound(sound::def_explode_fast);
 						mObjects[norm_x] = objects;
 						i--;
 						m--;
@@ -152,7 +156,7 @@ class Game {
 			camera.offset.y = (-player.getY() - GetMouseY()/5 + config::SCREEN_HEIGHT/2/camera.zoom)*camera.zoom;
 		}
 
-		void handleDraw(std::map<int,std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets, Camera2D& camera, Player& player){
+		void handleDraw(Camera2D& camera, Player& player, std::map<int,std::vector<Rectangle>>& mObjects, std::vector<Bullet>& bullets){
 			BeginDrawing();
 			ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
@@ -189,7 +193,7 @@ class Game {
 
 			currFrame ++;
 
-			//Map::drawSectors(norm_x);
+			Map::drawSectors(norm_x);
 
 
 			//DrawRectangle(player.getX(), player.getY(), player.getW(), player.getH(), RED);
@@ -206,4 +210,5 @@ class Game {
 			state = _state;
 		}
 };
+
 #endif

@@ -8,7 +8,7 @@ class Menu {
 		float value = config::FPS;
 		std::string state = "main";
 
-		//used in mainSettings
+		// used in mainSettings
 		int active = 0;
 		int oldActive;
 	public:
@@ -208,8 +208,6 @@ class Menu {
 			if(!showGame)
 				ClearBackground(RAYWHITE);
 			BeginMode2D(camera);
-
-
 
 			EndMode2D();
 			EndDrawing();

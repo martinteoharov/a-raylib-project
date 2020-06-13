@@ -1,21 +1,16 @@
-//cout
-#include <iostream>
-//vector
-#include <vector>
+#include <iostream> //cout
+#include <vector> //vector
 #include <map>
 //#include <list>
-//trigonometry
-#include <math.h>
+#include <math.h> //trigonometry
 #include <fstream> // read / write
-
 #include <filesystem> // read directories
-
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 #include "raylib.h"
-
 #include "utils.h"
 #include "config.h"
+#include "sound.h"
 #include "map.h"
 #include "bullet.h"
 #include "player.h"
@@ -39,10 +34,17 @@ int main() {
 
 
 	Camera2D camera = {{ 0 }, {0, 0}, 0.0f, 0.0f };
+
 	camera.zoom = 1.0f;
 	SetTargetFPS(config::FPS);
 	InitAudioDevice();      // Initialize audio device
 	GuiLoadStyle(("styles/" + config::TEXT_STYLE).c_str());
+
+	if(sound::LOAD_SOUND()){
+		std::cout << "SOUND CONFIG LOADED SUCCESSFULY" << std::endl;
+	}
+	SetMasterVolume(100.0); 
+
 
 
 	Menu menu;
@@ -112,7 +114,7 @@ int main() {
 			game.handleKeyPresses(camera, player, mObjects, bullets);
 			game.handleMovement(camera, player, mObjects, bullets);
 			game.handleCollision(camera, player, mObjects, bullets);
-			game.handleDraw(mObjects, bullets, camera, player);
+			game.handleDraw(camera, player, mObjects, bullets);
 
 		}
 		else if(game.getState() == 3) {
@@ -124,7 +126,7 @@ int main() {
 			game.handleKeyPresses(camera, player, mObjects, bullets);
 			game.handleMovement(camera, player, mObjects, bullets);
 			game.handleCollision(camera, player, mObjects, bullets);
-			game.handleDraw(mObjects, bullets, camera, player);
+			game.handleDraw(camera, player, mObjects, bullets);
 
 		}
 	}
